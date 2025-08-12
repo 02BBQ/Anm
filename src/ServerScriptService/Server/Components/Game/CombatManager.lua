@@ -1,0 +1,376 @@
+--//Variable
+local ServerScriptService = game:GetService('ServerScriptService');
+local ReplicatedStorage = game:GetService("ReplicatedStorage");
+local Players = game:GetService('Players');
+local HttpService = game:GetService('HttpService');
+local RunService = game:GetService('RunService');
+local TweenService = game:GetService('TweenService');
+
+local Server: Folder = ServerScriptService:WaitForChild('Server');
+local Components: Folder = Server.Components;
+local Shared = ReplicatedStorage.Shared;
+local SharedComponents = Shared.Components;
+
+local BridgeNet = require(SharedComponents.BridgeNet2);
+local Auxiliary = require(Shared.Utility.Auxiliary);
+local TroveClass = require(Shared.Utility.Trove);
+local SoundHandler = require(Shared.Utility.SoundHandler);
+
+local IsStudio = RunService:IsStudio();
+local random = Random.new();
+
+--//Module
+local CombatManager = {};
+CombatManager.__index = CombatManager;
+
+CombatManager.new = function(Entity: {})
+	local self = setmetatable({
+		
+		Parent = Entity;	
+		_Trove = TroveClass.new();
+		
+		Cancellables = {};
+		MobilityQueue = {};
+		
+		Timers = {};
+		
+		DamageMultiplier = 1;
+		
+		InCombat = false;
+		
+		Detectable = true;
+		
+		_Block = {
+			postureMax = 20;
+			IsBlocking = false;
+			Posture = 20;
+			Animation = nil;
+		};
+		
+	}, CombatManager);
+
+	return self;
+end;
+
+local function GetLowestValue(Ind: number, Tab: {})
+	if Auxiliary.Shared.Count(Tab) == 0 then
+		return;
+	end;
+	
+	local Lowest;
+	for _,v in Tab do
+		if not v[Ind] then continue end;
+		if not Lowest then
+			Lowest = v[Ind];
+			continue;
+		end;
+		if v[Ind] < Lowest then
+			Lowest = v[Ind];
+		end;
+	end;
+	
+	return Lowest;
+end;
+
+function CombatManager:UpdateCombatStatus()
+	local LastTick = self.LastCombatTick;
+	if not LastTick then
+		self.InCombat = false;
+		return;
+	end;
+	
+	self.InCombat = (tick()-self.LastCombatTick) < 30; --Information:Get('Combat/Default').InCombatDuration;
+end;
+
+function CombatManager:AddCombatStatus()
+	self.LastCombatTick = tick();
+	self:UpdateCombatStatus();
+	
+	task.delay(30, function() --Information:Get('Combat/Default').InCombatDuration, function()
+		self:UpdateCombatStatus();
+	end);
+end;
+
+function CombatManager:Block(held: boolean?)
+	-- if held then return end
+	local Entity = self.Parent;
+
+	self._Block.Animation = Entity.Animator:Fetch('Universal/Block/Main');
+	-- print(held);
+	if held then
+		if not self:CanUse() then return end
+		self:Parry();
+		if not self:IsStunned() then return end
+		self._Block.Animation:Play();
+		self:AddBlock();
+		self:UsingMove();
+	else
+		self:RemoveBlock();
+	end
+end
+
+function CombatManager:AddBlock()
+	self._Block.IsBlocking = true;
+	self._Block.Posture = self._Block.postureMax;
+end
+
+function CombatManager:RemoveBlock()
+	self:RemoveUsing(); 
+	if not self._Block.IsBlocking then return end
+	self._Block.IsBlocking = false;
+	self._Block.Posture = 0;
+	self._Block.Animation:Stop();
+end
+
+function CombatManager:TakeDamage(DamageData, sender)
+	local BridgeNet = shared.Define.bridge;
+	local entity = self.Parent;
+	local attackerEntity = sender;
+
+	local Victim = entity.Character.Rig;
+	local attacker = attackerEntity.Character.Rig;
+
+	local VFX : string? = DamageData.VFX;
+	local BaseDamage : number? = DamageData.Damage;
+	local Damage : number?;
+	Damage = BaseDamage
+
+	local Type : string? = DamageData.Type;
+
+	local EnemyHumanoid = entity.Character.Humanoid;
+
+	local function OnHit()
+
+		if self:IsParrying() and not DamageData.NotParryable then
+			entity.Cooldowns:Stop('Parry', 1);
+			attackerEntity.Combat:AttemptCancel(DamageData.Cancel or 1);
+			attackerEntity.EffectReplicator:CreateEffect("Stunned"):Debris();
+			_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
+				{
+					Victim = Victim;
+					Origin = Victim.HumanoidRootPart;
+					Root = attacker.HumanoidRootPart;
+					Type = "Parry";
+					Sound = "Hit/Parry";
+				}})
+
+			return	end
+
+		if DamageData.BypassBlock then
+			self:RemoveBlock();
+		end
+
+		if self:IsBlocking(DamageData) and not DamageData.BypassBlock then
+			self._Block.Posture -= (Damage or 0);
+
+			if self._Block.Posture <= 0 then
+				self:BlockBreak();
+			else
+				self.Parent.Animator:Fetch('Universal/Block/Hurt/'..math.random(1,3)):Play();
+				_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
+					{
+						Victim = Victim;
+						Origin = Victim.HumanoidRootPart;
+						Root = attacker.HumanoidRootPart;
+						Type = "Block";
+						Sound = "Hit/Block";
+					}})
+				return;
+			end
+		end
+
+		if DamageData.Knockback then
+			attackerEntity.Combat:Knockback(entity, DamageData.Knockback)
+			if DamageData.Knockback.Follow then
+				attackerEntity.Combat:Knockback(attackerEntity, DamageData.Knockback)
+			end
+		end
+
+		if DamageData.OnHit then
+			DamageData.OnHit(Victim)
+		end
+
+		if DamageData.Ragdoll then
+			entity.Character:Ragdoll(DamageData.Ragdoll.Duration)
+		end
+
+		if DamageData.Stun then
+			self:AttemptCancel(DamageData.Cancel or 1);
+			entity.EffectReplicator:CreateEffect("Stunned"):Debris(DamageData.Stun);
+		end
+
+		if DamageData.camShake then
+			--pcall(function()
+			--	if not attackerEntity.Player then return end;
+			--	_util:Fire(attackerEntity.Player, {
+			--		'addShake', DamageData.camShake;
+			--	});
+			--end)
+			--pcall(function()
+			--	if not entity.Player then return end;
+			--	_util:Fire(entity.Player, {
+			--		'addShake', DamageData.camShake;
+			--	});
+			--end)
+		end
+
+		if not EnemyHumanoid then return end
+
+		if Damage then
+			EnemyHumanoid:TakeDamage(Damage)
+
+			if VFX then
+				_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
+					{
+						Victim = Victim;
+						Origin = Victim.HumanoidRootPart;
+						Root = attacker.HumanoidRootPart;
+						Type = VFX;
+						Damage = Damage;
+						Sound = DamageData.Sound;
+						HitShake = true;
+					}})
+			end
+
+			entity.Animator:Fetch('Universal/Hurt'..random:NextInteger(1,3)):Play()
+		end
+	end;
+
+	OnHit();
+end
+
+function CombatManager:BlockBreak()
+	self:RemoveBlock();
+	local cantMove = self.Parent.EffectReplicator:CreateEffect("CantMove");
+	cantMove:Debris(1.5);
+	local stunned = self.Parent.EffectReplicator:CreateEffect("TrueStunned");
+	stunned:Debris(1.5);
+	_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
+		{
+			Origin = self.Parent.Character.Root;
+			Victim = self.Parent.Character.Rig;
+			Root = self.Parent.Character.Root;
+			Type = "BlockBreak";
+			Sound = "Hit/GuardBreak";
+		}})
+end
+
+function CombatManager:IsBlocking(DamageData)
+	if DamageData.Dot and self._Block.IsBlocking then
+		local Origin : Model? = typeof(DamageData.Origin) == "table" and DamageData.Origin.Character.Rig or DamageData.Origin;
+		local Victim : Model? = typeof(DamageData.Victim) == "table" and DamageData.Victim.Character.Rig or DamageData.Victim;
+
+		local selfToOtherChar = (Victim.HumanoidRootPart.Position - Origin.HumanoidRootPart.Position).Unit
+		local lookVector = Victim.HumanoidRootPart.CFrame.LookVector
+
+		local dotProduct = lookVector:Dot(selfToOtherChar)
+		--print(dotProduct)
+
+		if dotProduct <= -0.2 then
+			--print("Blocked")
+			return true
+		else
+			self:RemoveBlock();
+			return false
+		end
+	end
+
+	return self._Block.IsBlocking;
+end
+
+function CombatManager:CreateCancel(Level: number?, Callback: () -> ()?, IgnoreHit: boolean | {}?, DebugName: string?)
+	local CancelObject = {
+		Level = Level or 1;
+		IgnoreHit = IgnoreHit;
+		Added = {};
+		Callback = Callback or (function() end);
+		Cancelled = false;
+	};
+	self.Cancellables[CancelObject] = true;
+	
+	if typeof(IgnoreHit) == 'table' then
+		CancelObject.Included = IgnoreHit;
+		
+		for _,v in IgnoreHit do
+			v.Combat.Cancellables[CancelObject] = true;
+			v.Combat.Detectable = false;
+		end;
+	end;
+	
+	function CancelObject.RemoveShared()
+		if CancelObject.Included then
+			for _,v in CancelObject.Included do
+				v.Combat.Cancellables[CancelObject] = nil;
+				v.Combat.Detectable = true;
+			end;
+		end;
+	end;
+	
+	function CancelObject.Remove()
+		self.Cancellables[CancelObject] = nil;
+		CancelObject.RemoveShared();
+	end;
+	
+	function CancelObject:Add(Func)
+		table.insert(CancelObject.Added, Func);
+	end;
+	
+	if IsStudio then
+		task.delay(10, function()
+			if not self.Cancellables[CancelObject] then return end;
+			warn(debug.traceback('\n*\n		Cancel instance has existed for a significant amount of time, did you forget to remove it?\n*'));
+			if DebugName then
+				warn(`Called by: {DebugName}`);
+			end;
+		end);
+	end;
+		
+	return CancelObject;
+end;
+
+function CombatManager:AttemptCancel(Level: number)
+	for v in self.Cancellables do
+		if v.Level <= Level then
+			v.Cancelled = true;		
+			for _,Func in v.Added do
+				Func();
+			end;
+			v.Callback();
+			v.Remove();
+		else
+			if v.IgnoreHit then
+				return false;
+			end;
+		end;
+	end;
+	
+	return true;
+end;
+
+function CombatManager:IsActive()
+	local Acting = self.Parent.Character.Rig:GetAttribute("Acting")
+	local Stunned = self.Parent.Character.Rig:GetAttribute("Stunned")
+	local Ragdolled = self.Parent.Character.Rig:GetAttribute("Ragdolled")
+	
+	if Acting then 
+		return false;
+	end
+	if Stunned then 
+		return false;
+	end
+	if Ragdolled then 
+		return false;
+	end
+	if self.Acting then
+		return false;
+	end
+	
+	return true;
+end
+
+function CombatManager:Destroy()
+	self._Trove:Destroy();
+	self = nil;
+end;
+
+return CombatManager;

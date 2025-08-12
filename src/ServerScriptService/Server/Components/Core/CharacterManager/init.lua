@@ -1,0 +1,120 @@
+--//Variable
+local ServerScriptService = game:GetService('ServerScriptService');
+local ReplicatedStorage = game:GetService("ReplicatedStorage");
+local ServerStorage = game:GetService("ServerStorage");
+local Players = game:GetService('Players');
+local HttpService = game:GetService('HttpService');
+local RunService = game:GetService('RunService');
+local TweenService = game:GetService('TweenService');
+
+local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary);
+local Ragdoll = require(script.Ragdoll);
+local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
+
+local CharacterManager = {}
+
+CharacterManager.__index = CharacterManager;
+
+CharacterManager.new = function(Entity)
+	local self = setmetatable({
+		Parent = Entity;	
+		
+		Rig = nil;
+		Template = nil;
+		
+		Alive = false;
+		
+		_Connections = {};
+		RagdollQueue = {};
+		
+		OnRespawn = Signal.new();
+	}, CharacterManager);
+
+	return self;
+end;
+
+function CharacterManager:Respawn()
+	local Entity = self.Parent
+	if Entity.Player then
+		self.Rig:Destroy();
+		local newCharacter = Entity.Player:LoadCharacter();
+	else
+		if not self.Template then return end
+		self.Rig:Destroy();
+		self.Rig = self.Template:Clone();
+		self.Rig.Parent = workspace.Alive;
+	end
+	
+	Entity.Weapon.Equipped = false;
+end
+
+function CharacterManager:Ragdoll(Val, Absolute: boolean?)
+	local IsDuration = typeof(Val) == 'number';
+	if self.Ragdolled then
+		if not IsDuration and Val == true then return; end;
+	end;
+
+	if IsDuration then
+		Ragdoll.Ragdoll(self.Parent, true);
+		task.delay(Val, function()
+			Ragdoll.Ragdoll(self.Parent, false, Absolute);
+		end);
+	else
+		Ragdoll.Ragdoll(self.Parent, Val, Absolute);
+	end;
+end;
+
+function CharacterManager:InitCharacter()
+	local Entity = self.Parent
+	
+	local SpawnCon = Entity._Connections["_Respawn"]
+	if SpawnCon then
+		SpawnCon:Disconnect();
+	end
+	
+	self.RagdollQueue = {};
+	
+	local Rig = self.Rig;
+	self.Alive = true;
+
+	Rig:SetAttribute("Combo", 0)
+	
+	assert(Rig, 'There is no rig');
+	self.Humanoid = Rig:FindFirstChildOfClass("Humanoid")
+	self.Root = Rig.HumanoidRootPart
+	self.Animator = self.Humanoid:FindFirstChildOfClass("Animator")
+
+	for _,part in pairs(Rig:GetChildren()) do
+		if part:IsA("BasePart") then
+			part.CollisionGroup = "Entity";
+		end;
+	end;
+
+	self.Parent.Animator:Cache();
+	
+	self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true);
+	self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
+	self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
+	self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false);
+	
+	Entity._Connections["_Respawn"] = Rig.Humanoid.Died:Connect(function()
+		Entity._Connections["_Respawn"]:Disconnect();
+		
+		for i,con in pairs(self._Connections) do
+			con:Disconnect();	
+		end
+		
+		self:Ragdoll(true);
+		self.Alive = false;
+		task.wait(5);
+		self:Respawn();
+	end);
+end
+
+function CharacterManager:Destroy()
+	if self.Rig then
+		self.Rig:Destroy();
+	end;
+end;
+
+return CharacterManager
