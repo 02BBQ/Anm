@@ -10,6 +10,7 @@ local TweenService = game:GetService('TweenService');
 local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary);
 local Ragdoll = require(script.Ragdoll);
 local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
+local Race = require(ServerScriptService.Server.Components.Misc.Race);
 
 local CharacterManager = {}
 
@@ -76,6 +77,8 @@ function CharacterManager:InitCharacter()
 	
 	local Rig = self.Rig;
 	self.Alive = true;
+
+	Race.Initialize(Entity, self.Data.Race);
 
 	Rig:SetAttribute("Combo", 0)
 	

@@ -1,12 +1,14 @@
 --//Variables
 local Players = game:GetService('Players');
 local ReplicatedStorage = game:GetService('ReplicatedStorage');
+local serverScriptService = game:GetService('ServerScriptService');
 
 local Shared = ReplicatedStorage.Shared;
 local SharedComponents = Shared.Components;
 
 local ProfileService = require(script.Parent.ProfileService);
 local Auxiliary = require(Shared.Utility.Auxiliary);
+local Race = require(serverScriptService.Server.Components.Misc.Race);
 
 --//Module
 local ProfileHandler = {};
@@ -16,7 +18,7 @@ ProfileHandler.Constants = {
 	ProfileStoreName = 'TestingStaging_1a';
 	
 	DataTemplate = {
-		Race = {};
+		Race = "";
 		
 		Inventory = {};
 	};
@@ -73,6 +75,11 @@ function ProfileHandler.UpdateDate(profile: {})
 	profile.Data.Date = GetMonthYearKey()
 end
 
+function ProfileHandler:UpdateRace()
+	self.profile.Data.Race = Race.ChooseReroll();
+end
+
+
 ProfileHandler.new = function(Player: Player)	
 	local self = setmetatable({}, ProfileHandler);
 	self.Player = Player;
@@ -80,7 +87,7 @@ ProfileHandler.new = function(Player: Player)
 	if not self.Profile then
 		local maxWait = 10;
 		repeat
-			wait(.1)
+			task.wait(.1)
 			maxWait -= .1
 			self.Profile = ProfileHandler.GetProfileById(Player.UserId);
 		until self.Profile or maxWait <= 0
@@ -103,6 +110,9 @@ ProfileHandler.new = function(Player: Player)
 	self.Data.Wearing = {}
 	
 	ProfileHandler.UpdateDate(self.Profile)
+	if self.Data.Race == string.empty then
+		ProfileHandler:UpdateRace();
+	end
 	ProfileHandler.SessionProfiles[self.Player] = self.Profile
 	
 	assert(self.Player:IsDescendantOf(Players), 'Player Left, profile was not returned');
