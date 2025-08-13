@@ -10,7 +10,7 @@ local TweenService = game:GetService('TweenService');
 local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary);
 local Ragdoll = require(script.Ragdoll);
 local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
-local Race = require(ServerScriptService.Server.Components.Misc.Race);
+local Race = require(ReplicatedStorage.Shared.Components.Race);
 
 local CharacterManager = {}
 
@@ -43,10 +43,10 @@ function CharacterManager:Respawn()
 		if not self.Template then return end
 		self.Rig:Destroy();
 		self.Rig = self.Template:Clone();
-		self.Rig.Parent = workspace.Alive;
+		self.Rig.Parent = workspace.World.Alive;
 	end
 	
-	Entity.Weapon.Equipped = false;
+	-- Entity.Weapon.Equipped = false;
 end
 
 function CharacterManager:Ragdoll(Val, Absolute: boolean?)
@@ -78,14 +78,15 @@ function CharacterManager:InitCharacter()
 	local Rig = self.Rig;
 	self.Alive = true;
 
-	Race.Initialize(Entity, self.Data.Race);
-
-	Rig:SetAttribute("Combo", 0)
+	print(Entity.Data.Race);
+	Race.Initialize(Entity, Entity.Data.Race);
 	
 	assert(Rig, 'There is no rig');
 	self.Humanoid = Rig:FindFirstChildOfClass("Humanoid")
 	self.Root = Rig.HumanoidRootPart
 	self.Animator = self.Humanoid:FindFirstChildOfClass("Animator")
+
+	self.Humanoid.BreakJointsOnDeath = false;
 
 	for _,part in pairs(Rig:GetChildren()) do
 		if part:IsA("BasePart") then

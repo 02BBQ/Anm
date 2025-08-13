@@ -307,7 +307,7 @@ end;
 
 function CharacterHandler.HandleTool(Held, Tool)
 	local Character = LocalPlayer.Character;
-	if not Character or not Character:IsDescendantOf(workspace.Alive) then return end;
+	if not Character or not Character:IsDescendantOf(workspace.World.Alive) then return end;
 	local Tool = Tool or Character:FindFirstChildOfClass("Tool");
 
 	if not Tool then return end;
@@ -335,7 +335,7 @@ CharacterHandler.GetMouseTarget = function(Data)
 
 	local Position = CFrame.new(camera.CFrame.p, mouse.Hit.p)
 
-	for a, b in pairs(workspace.Alive:GetChildren()) do
+	for a, b in pairs(workspace.World.Alive:GetChildren()) do
 		if b.Name ~= LocalPlayer.Name and b:FindFirstChild("HumanoidRootPart") and b:FindFirstChild("Humanoid") and b:FindFirstChild("Humanoid").Health > 0 then
 			if (CFrame.new(camera.CFrame.p,  b.HumanoidRootPart.Position).lookVector - Position.lookVector).magnitude < Distance then
 				Distance = (CFrame.new(camera.CFrame.p,  b.HumanoidRootPart.Position).lookVector - Position.lookVector).magnitude
@@ -414,7 +414,7 @@ end)
 
 CharacterHandler.Jump = function()
 	local Character = LocalPlayer.Character;
-	if not Character or not Character:IsDescendantOf(workspace.Alive) then return end;
+	if not Character or not Character:IsDescendantOf(workspace.World.Alive) then return end;
 
 	if humanoid:GetState() == Enum.HumanoidStateType.Jumping then return end;
 

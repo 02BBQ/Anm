@@ -47,7 +47,7 @@ local function createColliderPart(part: BasePart, Entity)
 end
 
 function replaceJoints(Character, Entity)
-	if not Character or not Character:IsDescendantOf(workspace.Alive) then return end;
+	if not Character or not Character:IsDescendantOf(workspace.World.Alive) then return end;
 
 	local Humanoid = Character:FindFirstChildOfClass('Humanoid');
 	local HRP = Character:FindFirstChild('HumanoidRootPart');
@@ -94,7 +94,7 @@ function replaceJoints(Character, Entity)
 end
 
 function resetJoints(Character: Model, Entity)
-	if not Character or not Character:IsDescendantOf(workspace.Alive) then return end;
+	if not Character or not Character:IsDescendantOf(workspace.World.Alive) then return end;
 
 	local Humanoid = Character:FindFirstChildOfClass('Humanoid');
 	local HRP = Character:FindFirstChild('HumanoidRootPart');

@@ -3,13 +3,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage");
 local Tween = game:GetService("TweenService");
 local Maid = require(ReplicatedStorage.Shared.Utility.Maid);
 
-local ClientMaid = Maid.new();
+
+
+local UIMaid = Maid.new();
 
 local Player = Players.LocalPlayer;
 local Character = Player.Character;
 local Humanoid : Humanoid? = Character.Humanoid;
 local MainFrame = script.Parent.MainFrame;
-
 
 local StatusFrame = MainFrame:WaitForChild("Display")
 
@@ -23,15 +24,15 @@ local function UpdateHealth()
 
 	local Tween = Tween:Create(Health.Delay, TweenInfo.new(0.4), {Size = HPRatio});
 	Tween:Play();
-
 end
 
-
-ClientMaid:AddTask(Humanoid:GetPropertyChangedSignal("Health"):Connect(UpdateHealth))
-ClientMaid:AddTask(Humanoid:GetPropertyChangedSignal("MaxHealth"):Connect(UpdateHealth))
+UIMaid:AddTask(Humanoid:GetPropertyChangedSignal("Health"):Connect(UpdateHealth))
+UIMaid:AddTask(Humanoid:GetPropertyChangedSignal("MaxHealth"):Connect(UpdateHealth))
 UpdateHealth()
 
-Humanoid.Died:Connect(function()
+require(script.Leaderboard)(UIMaid);
+
+UIMaid:AddTask(Humanoid.Died:Connect(function()
 	UpdateHealth();
-	ClientMaid.Destroy();
-end)
+	UIMaid.Destroy();
+end));

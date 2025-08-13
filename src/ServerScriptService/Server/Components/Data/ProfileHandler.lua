@@ -8,7 +8,7 @@ local SharedComponents = Shared.Components;
 
 local ProfileService = require(script.Parent.ProfileService);
 local Auxiliary = require(Shared.Utility.Auxiliary);
-local Race = require(serverScriptService.Server.Components.Misc.Race);
+local RaceManager = require(SharedComponents.Race);
 
 --//Module
 local ProfileHandler = {};
@@ -19,6 +19,8 @@ ProfileHandler.Constants = {
 	
 	DataTemplate = {
 		Race = "";
+		
+		LastName = "";
 		
 		Inventory = {};
 	};
@@ -76,9 +78,20 @@ function ProfileHandler.UpdateDate(profile: {})
 end
 
 function ProfileHandler:UpdateRace()
-	self.profile.Data.Race = Race.ChooseReroll();
+	print(self.Profile.Data.Race);
+	if RaceManager[self.Profile.Data.Race] then return end;
+	self.Profile.Data.Race = RaceManager.ChooseReroll();
 end
 
+function ProfileHandler:UpdateName()
+	if not self.Profile.Data.LastName or self.Profile.Data.LastName == "" then
+		local Race = RaceManager.Races[self.Profile.Data.Race];
+		local lastName = Race.Names[math.random(1, #Race.Names)];
+		self.Profile.Data.LastName = lastName;
+	end;
+
+	self.Player:SetAttribute("LastName", self.Profile.Data.LastName);
+end
 
 ProfileHandler.new = function(Player: Player)	
 	local self = setmetatable({}, ProfileHandler);
@@ -110,9 +123,8 @@ ProfileHandler.new = function(Player: Player)
 	self.Data.Wearing = {}
 	
 	ProfileHandler.UpdateDate(self.Profile)
-	if self.Data.Race == string.empty then
-		ProfileHandler:UpdateRace();
-	end
+	self:UpdateRace();
+	self:UpdateName();
 	ProfileHandler.SessionProfiles[self.Player] = self.Profile
 	
 	assert(self.Player:IsDescendantOf(Players), 'Player Left, profile was not returned');

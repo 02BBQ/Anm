@@ -25,7 +25,7 @@ local FetchTypes = {
 
 	RootCFrame = function()
 		local Character = LocalPlayer.Character;
-		if not Character or not Character:IsDescendantOf(workspace.Alive) then return end;
+		if not Character or not Character:IsDescendantOf(workspace.World.Alive) then return end;
 		local HRP = Character:FindFirstChild('HumanoidRootPart');
 
 		return HRP.CFrame;
@@ -33,7 +33,7 @@ local FetchTypes = {
 
 	LastActionCheck = function()
 		local Character = LocalPlayer.Character;
-		if not Character or not Character:IsDescendantOf(workspace.Alive) then return end;
+		if not Character or not Character:IsDescendantOf(workspace.World.Alive) then return end;
 		local Humanoid: Humanoid = Character:FindFirstChildOfClass('Humanoid');
 		if not Humanoid then return end;
 
@@ -51,7 +51,7 @@ local FetchTypes = {
 
 	FloorMaterial = function()
 		local Character = LocalPlayer.Character;
-		if not Character or not Character:IsDescendantOf(workspace.Alive) then return end;
+		if not Character or not Character:IsDescendantOf(workspace.World.Alive) then return end;
 		local Humanoid: Humanoid = Character:WaitForChild('Humanoid');
 		if not Humanoid then return end;
 

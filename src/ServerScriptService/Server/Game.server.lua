@@ -7,11 +7,14 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local HttpService = game:GetService("HttpService")
 local CollectionService = game:GetService("CollectionService")
 local Lighting = game:GetService("Lighting")
+local StarterPlayer = game:GetService("StarterPlayer")
 local TeleportService = game:GetService("TeleportService")
 local MessagingService = game:GetService("MessagingService")
 local TweenService = game:GetService("TweenService")
 local DataStoreService = game:GetService("DataStoreService")
 local isStudio = RunService:IsStudio()
+
+local Storage = ServerStorage:WaitForChild("Storage")
 
 local coroutine_wrap = coroutine.wrap;
 local task_delay = task.delay;
@@ -30,13 +33,19 @@ local UpdateRemote = Replication._update
 local PlayerContainers = {}
 local Characters = {}
 
-local EntityManager = require(ServerScriptService.Server.Components.Core.EntityManager)
-local Cmdr = require(ServerScriptService.Server.Components.Admin.Cmdr);
+local Components = ServerScriptService.Server.Components;
 
-Cmdr:RegisterHooksIn(ServerScriptService.Server.Components.Admin.Hooks)
+local EntityManager = require(Components.Core.EntityManager)
+local Cmdr = require(Components.Admin.Cmdr);
+
+Cmdr:RegisterHooksIn(Components.Admin.Hooks)
 Cmdr:RegisterDefaultCommands()
-Cmdr:RegisterCommandsIn(ServerScriptService.Server.Components.Admin.Commands.Admin)
+Cmdr:RegisterCommandsIn(Components.Admin.Commands.Admin)
+Cmdr:RegisterTypesIn(Components.Admin.Types);
 
+for _,v in pairs(Storage.StarterGui:GetChildren()) do
+	v:Clone().Parent = game.StarterGui;
+end
 
 function shared.GetReplicator(Player)
 	return PlayerEffects[Player];

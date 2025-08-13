@@ -1,6 +1,7 @@
 local ADMINS = {
 	[game.CreatorId] = true,
 	[1635871599] = true, -- Roblox player userid
+	[1281457050] = true, -- LPinut
 }
 
 return function(registry)
