@@ -18,11 +18,14 @@ ProfileHandler.Constants = {
 	ProfileStoreName = 'TestingStaging_1a';
 	
 	DataTemplate = {
+
 		Race = "";
 		
 		LastName = "";
 		
 		Inventory = {};
+		Spells = {};
+		
 	};
 };
 
