@@ -23,6 +23,16 @@ ProfileHandler.Constants = {
 		
 		LastName = "";
 		
+
+		--[[
+		Inventory = {
+			-- Example item structure
+			-- ["ItemId - GUID"] = {
+			--  Name
+			-- 	Attributes = {}
+			-- }
+		};
+		]]
 		Inventory = {};
 		Spells = {};
 		
