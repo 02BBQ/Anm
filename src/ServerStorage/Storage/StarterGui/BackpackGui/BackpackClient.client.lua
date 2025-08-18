@@ -30,6 +30,8 @@ local Grid           = Scrolling:WaitForChild("UIGridLayout", 9e9)
 --// Constants
 local SLOTS_COUNT = 12
 local SLOT_KEY_LABELS = { "1","2","3","4","5","6","7","8","9","0","-","=" }
+local DEFUALT_COLOR = Color3.fromRGB(11, 11, 11);
+local SELECT_COLOR = Color3.fromRGB(22, 22, 22);
 
 local TOOLTYPE = {
 	PrimaryWeapon = 0,
@@ -191,7 +193,7 @@ local function refreshUI()
 			if Character:FindFirstChild(name) then
 				if not isSelected then
 					TweenService:Create(frame, TweenInfo.new(0.1), {
-						BackgroundColor3 = Color3.fromRGB(255, 248, 238),
+						BackgroundColor3 = SELECT_COLOR,
 						TextTransparency = 0
 					}):Play()
 					TweenService:Create(frame.Overlay, TweenInfo.new(0.1, Enum.EasingStyle.Back), {
@@ -201,7 +203,7 @@ local function refreshUI()
 				end
 			elseif isSelected then
 				TweenService:Create(frame, TweenInfo.new(0.1), {
-					BackgroundColor3 = Color3.fromRGB(215, 203, 191),
+					BackgroundColor3 = DEFUALT_COLOR,
 					TextTransparency = 0.2
 				}):Play()
 				TweenService:Create(frame.Overlay, TweenInfo.new(0.1), {
@@ -209,7 +211,7 @@ local function refreshUI()
 				}):Play()
 				CollectionService:RemoveTag(frame, "BPSelected")
 			else
-				frame.BackgroundColor3 = Color3.fromRGB(215, 203, 191)
+				frame.BackgroundColor3 = DEFUALT_COLOR
 				frame.TextTransparency = 0.2
 				frame.Overlay.Size     = UDim2.new(1, 6, 1, 6)
 			end
@@ -252,7 +254,7 @@ local function createToolButton(tool: Tool, mayAutoSlot: boolean)
 		local currentSlot = info.slot
 		draggingToolName = name
 
-		frame.BackgroundColor3 = Color3.fromRGB(255, 248, 238)
+		frame.BackgroundColor3 = SELECT_COLOR
 		frame.Parent = guiRoot
 
 		for i = 1, SLOTS_COUNT do

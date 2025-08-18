@@ -11,6 +11,7 @@ local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary);
 local Ragdoll = require(script.Ragdoll);
 local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
 local Race = require(ReplicatedStorage.Shared.Components.Race);
+local ItemFactory = require(ServerScriptService.Server.Components.Misc.ItemFactory);
 
 local CharacterManager = {}
 
@@ -113,6 +114,10 @@ function CharacterManager:InitCharacter()
 		task.wait(5);
 		self:Respawn();
 	end);
+
+	for _,v in pairs(Entity.Data.Inventory) do
+		ItemFactory.CreateItem(Entity, v);
+	end;
 end
 
 function CharacterManager:Destroy()

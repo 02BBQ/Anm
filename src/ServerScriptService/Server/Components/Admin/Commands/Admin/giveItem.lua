@@ -3,14 +3,14 @@ local Players = game:GetService('Players');
 
 --//Module
 return {
-	Name = "setRace";
-	Description = "change target's race";
+	Name = "giveItem";
+	Description = "gives Item to Target";
 	Group = "Special";
 	Args = {
 		
 		{
-			Type = "race";
-			Name = "Race Name";
+			Type = "item";
+			Name = "Item Name";
 		};
 
 		{

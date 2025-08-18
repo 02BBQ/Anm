@@ -106,18 +106,18 @@ end
 
 function Entities:GetClientEntity()
 	return {
-		Player = self.Parent.Player;
+		Player = self.Player;
 		Character = {
-			Humanoid = self.Parent.Character.Humanoid;
-			Root = self.Parent.Character.Root;
-			Rig = self.Parent.Character.Rig;	
+			Humanoid = self.Character.Humanoid;
+			Root = self.Character.Root;
+			Rig = self.Character.Rig;	
 		};
 	};
 end;
 
 Entities.Spawn = function(TemplateName: Model)
 	local Template = EntityTemplates:FindFirstChild(TemplateName);
-	assert(TemplateName, 'Template was not found!');
+	assert(Template, 'Template was not found!');
 
 	local NewEntity = Entities.new();
 	NewEntity.Character.Template = Template;
