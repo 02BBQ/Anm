@@ -13,7 +13,7 @@ local itemInfo =
     },
     -- Scrolls
     ["Scroll Of SuperDreamySmite"] = {
-        Description = "Learn Smite",
+        Description = "Learn SuperDreamySmite",
         Type = "Trinket",
         Rarity = "Common",
     },

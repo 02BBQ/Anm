@@ -1,20 +1,25 @@
---//Variables
+--// Services
 local Players = game:GetService('Players');
 local ReplicatedStorage = game:GetService('ReplicatedStorage');
 local UserInputService = game:GetService('UserInputService');
 local ContextActionService = game:GetService('ContextActionService');
 local RunService = game:GetService("RunService")
 
+--// Locations
 local Shared = ReplicatedStorage.Shared;
 local Map: Folder = workspace:WaitForChild("World"):WaitForChild('Map');
 
-local LocalPlayer: Player = Players.LocalPlayer;
-
+--// Modules
 local bridgeNet = require(Shared.Components.BridgeNet2);
 local CharacterHandler = require(script.Parent.CharacterHandler);
 
+--// Variables
+local LocalPlayer: Player = Players.LocalPlayer;
 local _use = bridgeNet.ReferenceBridge("_use");
+local Remote = LocalPlayer.Character:WaitForChild("RemoteEvent", 100);
+assert(Remote, "RemoteEvent not found in StarterCharacterScripts");
 
+--// Component
 local ActionComponent = {}
 ActionComponent.__index = ActionComponent
 
@@ -67,8 +72,11 @@ function ActionComponent.new()
 end
 
 function ActionComponent:LightAttack(held: boolean)
-	local data = {held = held};
-	_use:Fire({"LightAttack", data})
+	local Character = LocalPlayer.Character;
+	local Tool = Character:FindFirstChildOfClass("Tool");
+
+	local data = {held = held, tool = Tool};
+	_use:Fire({"M1", data})
 end
 
 function ActionComponent:Critical(held: boolean)
@@ -79,7 +87,6 @@ end
 function ActionComponent:Block(held: boolean)
 	local data = {held = held};
 	_use:Fire({"Block", data})
-	
 end
 
 function ActionComponent:Dash(held: boolean)

@@ -37,6 +37,7 @@ CombatManager.new = function(Entity: {})
 		DamageMultiplier = 1;
 		
 		InCombat = false;
+		_Active = true;
 		
 		Detectable = true;
 		
@@ -46,11 +47,49 @@ CombatManager.new = function(Entity: {})
 			Posture = 20;
 			Animation = nil;
 		};
+		_ParryingQueue = {};
 		
 	}, CombatManager);
 
 	return self;
 end;
+
+function CombatManager:IsStunned()
+	local Character = self.Parent.Character.Rig;
+	if Character.Humanoid.Health <= 0 then 
+		return true;
+	end
+	if not self._Active then
+		return true;
+	end
+	if self.Parent.EffectReplicator:FindEffect("Stunned") then 
+		return true;
+	end
+	if self.Parent.EffectReplicator:FindEffect("TrueStunned") then 
+		return true;
+	end
+	if self.Parent.Character.Ragdolled then
+		return true;
+	end
+	return false;
+end
+
+function CombatManager:CanUse()
+	local Character = self.Parent.Character.Rig;
+	if Character.Humanoid.Health <= 0 then 
+		return false;
+	end
+	if self.Parent.EffectReplicator:FindEffect("TrueStunned") then 
+		return false;
+	end
+	if not self._Active then
+		return false;
+	end
+	if self.Parent.Character.Ragdolled then
+		return false;
+	end
+	return true;
+end
 
 local function GetLowestValue(Ind: number, Tab: {})
 	if Auxiliary.Shared.Count(Tab) == 0 then
@@ -71,6 +110,10 @@ local function GetLowestValue(Ind: number, Tab: {})
 	
 	return Lowest;
 end;
+
+function CombatManager:Active(bool: boolean)
+	self._Active = bool;
+end
 
 function CombatManager:UpdateCombatStatus()
 	local LastTick = self.LastCombatTick;
@@ -100,10 +143,10 @@ function CombatManager:Block(held: boolean?)
 	if held then
 		if not self:CanUse() then return end
 		self:Parry();
-		if not self:IsStunned() then return end
+		if self:IsStunned() then return end
 		self._Block.Animation:Play();
 		self:AddBlock();
-		self:UsingMove();
+		self._Active = false;
 	else
 		self:RemoveBlock();
 	end
@@ -115,12 +158,39 @@ function CombatManager:AddBlock()
 end
 
 function CombatManager:RemoveBlock()
-	self:RemoveUsing(); 
+	self._Active = true;
 	if not self._Block.IsBlocking then return end
 	self._Block.IsBlocking = false;
 	self._Block.Posture = 0;
 	self._Block.Animation:Stop();
 end
+
+function CombatManager:IsParrying()
+	return #self._ParryingQueue > 0;
+end;
+
+function CombatManager:AddParryingFrame()
+	table.insert(self._ParryingQueue, true);
+end;
+
+function CombatManager:Parry()
+	if self.Parent.Cooldowns.OnCooldown['Parry'] then return end;
+	self.Parent.Cooldowns:Add('Parry', 1);
+	local ParryingWindow = 0.22;
+	self:AddParryingFrame();
+
+	local anim = self.Parent.Animator:Fetch('Universal/Parry');
+	anim:Play();
+
+	task.delay(ParryingWindow, function()
+		self:RemoveParryingFrame();
+	end);
+end;
+
+function CombatManager:RemoveParryingFrame()
+	if #self._ParryingQueue <= 0 then return end;
+	table.remove(self._ParryingQueue, 1);
+end;
 
 function CombatManager:TakeDamage(DamageData, sender)
 	local BridgeNet = shared.Define.bridge;

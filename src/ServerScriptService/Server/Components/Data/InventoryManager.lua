@@ -64,7 +64,10 @@ InventoryManager.Add = function(player, name)
     item.Id = id;
     item.Attributes = item.Attributes or nil;
 
-    Entity.Data.Inventory[id] = item;
+    Entity.Data.Inventory[id] = {
+        Name = item.Name;
+        Attributes = item.Attributes;
+    };
 
     ItemFactory.CreateItem(Entity, item);
 end;

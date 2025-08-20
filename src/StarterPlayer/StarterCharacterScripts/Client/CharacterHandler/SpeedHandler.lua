@@ -88,7 +88,7 @@ return function()
 			humanoid.WalkSpeed = WalkSpeed
 		end
 		
-		if tick() - jumpTick < 1.2 then
+		if tick() - jumpTick < 0.6 then
 			JumpPower *= 0.7
 		end
 	

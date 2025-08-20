@@ -12,6 +12,7 @@ local Ragdoll = require(script.Ragdoll);
 local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
 local Race = require(ReplicatedStorage.Shared.Components.Race);
 local ItemFactory = require(ServerScriptService.Server.Components.Misc.ItemFactory);
+local InitializeManager = require(script.Initialize);
 
 local CharacterManager = {}
 
@@ -79,8 +80,8 @@ function CharacterManager:InitCharacter()
 	local Rig = self.Rig;
 	self.Alive = true;
 
-	print(Entity.Data.Race);
-	Race.Initialize(Entity, Entity.Data.Race);
+	-- Character Setup 시스템 실행
+	InitializeManager.Initialize(Entity);
 	
 	assert(Rig, 'There is no rig');
 	self.Humanoid = Rig:FindFirstChildOfClass("Humanoid")
@@ -114,10 +115,6 @@ function CharacterManager:InitCharacter()
 		task.wait(5);
 		self:Respawn();
 	end);
-
-	for _,v in pairs(Entity.Data.Inventory) do
-		ItemFactory.CreateItem(Entity, v);
-	end;
 end
 
 function CharacterManager:Destroy()

@@ -197,6 +197,7 @@ end;
 
 Ragdoll.Ragdoll = function(Entity, Bool: boolean, Absolute: boolean?)
 	if Bool then
+		Entity.Ragdolled = true;
 		assert(not Absolute, debug.traceback("Can't create ragdoll with absolute parameter!"));
 		table.insert(Entity.Character.RagdollQueue, Bool);
 	else

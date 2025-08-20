@@ -54,10 +54,10 @@ function module.ChooseReroll()
 	return result
 end
 
-function module.Initialize(Entity, Race)
+function module.Initialize(Entity)
 	local character = Entity.Character;
 	
-	Races[Race]["Initialize"](Entity);
+	Races[Entity.Data.Race]["Initialize"](Entity);
 end
 
 return module

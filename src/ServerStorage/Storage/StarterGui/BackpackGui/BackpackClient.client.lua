@@ -28,7 +28,7 @@ local Grid           = Scrolling:WaitForChild("UIGridLayout", 9e9)
 --until Character:FindFirstChild("SkillsLoaded") or Character:FindFirstChild("SeraphLoad")
 
 --// Constants
-local SLOTS_COUNT = 12
+local SLOTS_COUNT = 10
 local SLOT_KEY_LABELS = { "1","2","3","4","5","6","7","8","9","0","-","=" }
 local DEFUALT_COLOR = Color3.fromRGB(11, 11, 11);
 local SELECT_COLOR = Color3.fromRGB(22, 22, 22);
@@ -46,7 +46,7 @@ local TOOLTYPE = {
 --// State (client-only)
 local equipCooldowns = {}           -- toolName -> timestamp
 local slotToTool     = {}           -- slot index -> toolName
-local toolInfo       = {}           -- toolName -> { frame, tooltype, slot, quantityCon }
+local 	toolInfo       = {}           -- toolName -> { frame, tooltype, slot, quantityCon }
 local savedSlotMap   = {}           -- "1".."12" -> toolName (session-only, no persistence)
 
 local slotMarkers = {}
@@ -70,12 +70,14 @@ local function findToolIn(container: Instance, name: string): Tool?
 end
 
 local function classifyTool(tool: Tool): number
-	if tool:FindFirstChild("PrimaryWeapon") then return TOOLTYPE.PrimaryWeapon end
-	if tool:FindFirstChild("Skill")         then return TOOLTYPE.Skill         end
-	if tool:FindFirstChild("Spell")         then return TOOLTYPE.Spell         end
-	if tool:FindFirstChild("Item")          then return TOOLTYPE.Item          end
-	if tool:FindFirstChild("Trinket")       then return TOOLTYPE.Trinket       end
-	if tool:FindFirstChild("isIngredient")  then return TOOLTYPE.Ingredient    end
+	local Type = tool:GetAttribute("Type");
+	if not Type then return TOOLTYPE.Other end
+	if Type == ("PrimaryWeapon") then return TOOLTYPE.PrimaryWeapon end
+	if Type == ("Skill")         then return TOOLTYPE.Skill         end
+	if Type == ("Spell")         then return TOOLTYPE.Spell         end
+	if Type == ("Item")          then return TOOLTYPE.Item          end
+	if Type == ("Trinket")       then return TOOLTYPE.Trinket       end
+	if Type == ("isIngredient")  then return TOOLTYPE.Ingredient    end
 	return TOOLTYPE.Other
 end
 
