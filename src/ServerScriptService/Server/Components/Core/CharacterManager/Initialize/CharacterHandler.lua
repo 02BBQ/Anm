@@ -30,6 +30,8 @@ function deepcopy(orig)
 end
 
 CharacterHandler.Initialize = function(Entity)
+    
+
 	for id,v in pairs(Entity.Data.Inventory) do
 		local item = {};
 		item = deepcopy(Wiki.ItemInfo[v.Name]);

@@ -42,6 +42,10 @@ end;
 function VFXManager:Fire(ModulePath: string, Data: {}, Receiving: {} | Player | nil)
 	local ClientEntity = self:GetClientEntity();
 
+	if not Receiving then
+		Receiving = Network.AllPlayers();
+	end
+
 	if Data then
 		for i,v: {}? in Data do
 			if typeof(v) ~= 'table' then continue end;

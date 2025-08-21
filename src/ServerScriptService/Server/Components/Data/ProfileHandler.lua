@@ -81,9 +81,9 @@ function ProfileHandler.UpdateDate(profile: {})
 end
 
 function ProfileHandler:UpdateRace()
-	print(self.Profile.Data.Race);
-	if RaceManager[self.Profile.Data.Race] then return end;
+	if RaceManager.Races[self.Profile.Data.Race] then return end;
 	self.Profile.Data.Race = RaceManager.ChooseReroll();
+	print(self.Profile.Data.Race);
 end
 
 function ProfileHandler:UpdateName()

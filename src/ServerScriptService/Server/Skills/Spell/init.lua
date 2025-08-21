@@ -56,7 +56,7 @@ function Spell:ActivateSpell(Entity, Args)
 
     Entity.Combat:Active(true);
 
-    self:OnCast();
+    self:OnCast(Entity, Args);
 end
 
 return Spell;	

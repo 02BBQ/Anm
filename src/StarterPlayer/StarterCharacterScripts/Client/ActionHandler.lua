@@ -12,9 +12,11 @@ local Map: Folder = workspace:WaitForChild("World"):WaitForChild('Map');
 --// Modules
 local bridgeNet = require(Shared.Components.BridgeNet2);
 local CharacterHandler = require(script.Parent.CharacterHandler);
+local Auxiliary = require(Shared.Utility.Auxiliary);
 
 --// Variables
 local LocalPlayer: Player = Players.LocalPlayer;
+local Mouse = LocalPlayer:GetMouse();
 local _use = bridgeNet.ReferenceBridge("_use");
 local Remote = LocalPlayer.Character:WaitForChild("RemoteEvent", 100);
 assert(Remote, "RemoteEvent not found in StarterCharacterScripts");
@@ -62,6 +64,22 @@ local FetchTypes = {
 
 		return Humanoid.FloorMaterial;
 	end;
+
+	GetMouse = function(IgnoreCanCollide)
+		if IgnoreCanCollide then
+			local ray = workspace.CurrentCamera:ScreenPointToRay(Mouse.X, Mouse.Y)
+			local OriginPos = workspace.CurrentCamera.CFrame.Position
+			
+			local RayLength = 1000
+			
+			local result = workspace:Raycast(ray.Origin, ray.Direction * RayLength, Auxiliary.Shared.RayParams.MapRespect)
+			if not result then return ray.Origin + ray.Direction * 1000, nil end
+			
+			return CFrame.new(result.Position).Position
+		end
+		
+		return LocalPlayer:GetMouse().Hit.Position;
+	end;
 };
 
 
@@ -75,7 +93,7 @@ function ActionComponent:LightAttack(held: boolean)
 	local Character = LocalPlayer.Character;
 	local Tool = Character:FindFirstChildOfClass("Tool");
 
-	local data = {held = held, tool = Tool};
+	local data = {held = held, tool = Tool, mousePos = FetchTypes.GetMouse(true)};
 	_use:Fire({"M1", data})
 end
 

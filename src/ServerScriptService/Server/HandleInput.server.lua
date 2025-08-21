@@ -60,7 +60,7 @@ local function HandleM1(Entity, args)
         if tool:GetAttribute("Type") == "Spell" then
             -- Handle spell casting
             local spellName = tool.Name;
-            Skills['Spell/' .. spellName]:ActivateSpell(Entity, args);
+            Skills['Spell/' .. spellName]:ActivateSpell(Entity, data);
         end
     else
         -- Entity.Combat:LightAttack(held);

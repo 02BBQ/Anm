@@ -142,10 +142,19 @@ local ParamFuncs = {
 
 		return NewParams;
 	end);
+
+	MapRespect = (function()
+		local NewParams: RaycastParams = RaycastParams.new();
+		NewParams.FilterType = Enum.RaycastFilterType.Include;
+		NewParams.FilterDescendantsInstances = Auxiliary.MapInstances;
+		NewParams.RespectCanCollide = true;
+		return NewParams;
+	end);
 };
 
 Auxiliary.RayParams = {
 	Map = ParamFuncs.Map();
+	MapRespect = ParamFuncs.MapRespect();
 };
 
 for _,v in pairs(script:GetChildren()) do
