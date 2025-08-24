@@ -44,7 +44,7 @@ function Spell:CastSigns(Entity)
 end
 
 function Spell:ActivateSpell(Entity, Args)
-    assert(Entity, "Entity is not set for the spell");
+	assert(Entity, "Entity is not set for the spell");
 
     if not Entity.Combat:CanUse() then
         return;

@@ -21,8 +21,6 @@ function Weapon.new(Entity)
     local self = setmetatable({}, Weapon);
     self.Parent = Entity;
     self.Stats = {};
-    
-    
 end
 
 return Weapon;

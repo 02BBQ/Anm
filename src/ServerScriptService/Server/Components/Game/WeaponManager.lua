@@ -13,13 +13,15 @@ local Storage = ServerStorage.Storage;
 
 local Auxiliary = require(Shared.Utility.Auxiliary);
 local Attribute = require(Shared.Utility.Attribute);
-local EntityManager = require(Server.Components.Core.EntityManager);
 local Wiki = require(Shared.Wiki);
 local WeaponInfo = Wiki.WeaponInfo;
 
 local WeaponManager = {}
 WeaponManager.__index = WeaponManager;
 
+WeaponManager.__tostring = function(self )
+	return self._weapon or "N/A";
+end;
 
 WeaponManager.new = function(Entity)
 	local self = setmetatable({
@@ -37,7 +39,7 @@ WeaponManager.new = function(Entity)
 end;
 
 function WeaponManager:Initialize()
-	if not WeaponInfo[self.Parent.Character.Weapon] then return end;
+	--if not WeaponInfo[self.Parent.Character.Weapon] then return end;
 end;
 
 function WeaponManager:ToggleEquip()
@@ -102,8 +104,14 @@ function WeaponManager:Equip()
 end; 
 
 function WeaponManager:LightAttack(Entity, Args)
-	if not self._weapon then return end;
-	self._weapon:LightAttack(Args);	
+	-- 무기가 없으면 기본 주먹 사용
+	if not self._weapon then
+		local Skills = require(ServerScriptService.Server.Skills);
+		local LightAttackSkill = Skills["Universal/LightAttack"];
+		LightAttackSkill({Caster = self.Parent.Parent,Args = Args});
+		return;
+	end;
+	self._weapon:LightAttack({Caster = self.Parent.Parent,Args = Args});	
 end
 
 function WeaponManager:Critical(Entity, Args)

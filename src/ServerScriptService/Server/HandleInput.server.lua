@@ -47,10 +47,12 @@ local function HandleM1(Entity, args)
     local held = data["held"];
     local tool = data["tool"];
 
-    if tool and tool.Parent ~= Entity.Character.Rig then
-        print("Tool is not in the character, ignoring M1 action.");
-        return; -- Tool is not in the character, ignore
-    end
+	if tool then
+		if tool and tool.Parent ~= Entity.Character.Rig then
+			print("Tool is not in the character, ignoring M1 action.");
+			return; -- Tool is not in the character, ignore
+		end
+	end
 
     if tool then
         local Activator = tool:FindFirstChild("Activator");
@@ -62,8 +64,11 @@ local function HandleM1(Entity, args)
             local spellName = tool.Name;
             Skills['Spell/' .. spellName]:ActivateSpell(Entity, data);
         end
-    else
-        -- Entity.Combat:LightAttack(held);
+	else
+        -- 툴이 없으면 기본 주먹 평타
+        if Entity.Character.Weapon then
+			Entity.Character.Weapon:LightAttack(Entity, {held = held});
+        end
     end
 end
 

@@ -13,6 +13,8 @@ local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
 local Race = require(ReplicatedStorage.Shared.Components.Race);
 local ItemFactory = require(ServerScriptService.Server.Components.Misc.ItemFactory);
 local InitializeManager = require(script.Initialize);
+local WeaponManager = require(ServerScriptService.Server.Components.Game.WeaponManager);
+local Trove = require(ReplicatedStorage.Shared.Utility.Trove)
 
 local CharacterManager = {}
 
@@ -22,6 +24,7 @@ CharacterManager.new = function(Entity)
 	local self = setmetatable({
 		Parent = Entity;	
 		
+		_Trove = Trove.new();
 		Rig = nil;
 		Template = nil;
 		
@@ -32,6 +35,8 @@ CharacterManager.new = function(Entity)
 		
 		OnRespawn = Signal.new();
 	}, CharacterManager);
+
+	self.Weapon = self._Trove:Add(WeaponManager.new(self));
 
 	return self;
 end;
@@ -121,6 +126,7 @@ function CharacterManager:Destroy()
 	if self.Rig then
 		self.Rig:Destroy();
 	end;
+	self._Trove:Destroy();
 end;
 
 return CharacterManager

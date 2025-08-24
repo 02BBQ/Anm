@@ -51,14 +51,6 @@ CharacterHandler.Initialize = function(Entity)
 
 		ItemFactory.CreateItem(Entity, item);
 	end;
-    -- local Character = Entity.Character;
-    -- assert(Character, "Character is not set for the entity");
-
-    -- Character.Rig.ChildAdded:Connect(function(Child)
-    --     if Child:IsA("Tool") then
-
-    --     end
-    -- end);
 end;
 
 return CharacterHandler;

@@ -49,6 +49,9 @@ CombatManager.new = function(Entity: {})
 		};
 		_ParryingQueue = {};
 		
+		ComboTick = 0;
+		Combo = 1;
+		
 	}, CombatManager);
 
 	return self;
