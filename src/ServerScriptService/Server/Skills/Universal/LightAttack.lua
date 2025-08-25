@@ -26,7 +26,7 @@ return function(Params)
 	if not Entity.Combat:CanUse() then return end;
 	if Args.held then return end;
     
-    local WeaponInfo = WeaponInfos[Character._weapon or "Fist"];
+    local WeaponInfo = WeaponInfos[Character._weapon or "TesterSword"];
 	
 	if tick() >= comboResetTime + Entity.Combat.ComboTick then
 		Entity.Combat.Combo = 1

@@ -21,6 +21,23 @@ local itemInfo =
         Offset = CFrame.new(0, 0, -3.5);
 
         Endlag = 0;
+    };
+    ["TesterSword"] = {
+        Animation = "Weapons/Sword";
+        SwingSounds = {
+            "fistswing";
+        };
+
+        Damage = 5;
+        SwingSpeed = 1.1;
+
+        LightAttack = nil;
+        Critical = "Fist";
+
+        Size = Vector3.new(7,7,7);
+        Offset = CFrame.new(0, 0, -3.5);
+
+        Endlag = 0;
     }
 };
 

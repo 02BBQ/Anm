@@ -61,7 +61,7 @@ Spell.RayPierce = function(cast, rayResult, segmentVelocity)
 	return false
 end
 CastBehavior.CanPierceFunction = Spell.RayPierce
-
+ 
 
 
 function Spell:OnCast(Entity, Args)
