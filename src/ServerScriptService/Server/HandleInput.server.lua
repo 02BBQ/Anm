@@ -59,10 +59,17 @@ local function HandleM1(Entity, args)
         if Activator then
             require(Activator).Active(Entity);
         end
-        if tool:GetAttribute("Type") == "Spell" then
+        local Type = tool:GetAttribute("Type");
+        if Type == "Spell" then
             -- Handle spell casting
             local spellName = tool.Name;
             Skills['Spell/' .. spellName]:ActivateSpell(Entity, data);
+            return;
+        end
+        if Type == "Weapon" then
+            if Entity.Character.Weapon then
+                Entity.Character.Weapon:LightAttack(Entity, {held = held});
+            end
         end
 	else
         -- 툴이 없으면 기본 주먹 평타

@@ -14,6 +14,7 @@ local Storage = ServerStorage.Storage;
 local Auxiliary = require(Shared.Utility.Auxiliary);
 local Attribute = require(Shared.Utility.Attribute);
 local Wiki = require(Shared.Wiki);
+local Skills = require(ServerScriptService.Server.Skills);
 local WeaponInfo = Wiki.WeaponInfo;
 
 local WeaponManager = {}
@@ -105,13 +106,9 @@ end;
 
 function WeaponManager:LightAttack(Entity, Args)
 	-- 무기가 없으면 기본 주먹 사용
-	if not self._weapon then
-		local Skills = require(ServerScriptService.Server.Skills);
-		local LightAttackSkill = Skills["Universal/LightAttack"];
-		LightAttackSkill({Caster = self.Parent.Parent,Args = Args});
-		return;
-	end;
-	self._weapon:LightAttack({Caster = self.Parent.Parent,Args = Args});	
+	local LightAttackSkill = Skills["Universal/LightAttack"];
+	LightAttackSkill({Caster = self.Parent.Parent,Args = Args});
+	return;
 end
 
 function WeaponManager:Critical(Entity, Args)

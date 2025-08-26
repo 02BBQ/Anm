@@ -38,12 +38,6 @@ export type itemTable = {
 	Attributes: {};
 }
 
-InventoryManager.__index = InventoryManager;
-
-InventoryManager.new = function(Entity)
-	return setmetatable({}, InventoryManager);
-end;
-
 InventoryManager.Add = function(player, name)
     if not player then
         return false;

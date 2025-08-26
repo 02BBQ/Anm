@@ -31,12 +31,10 @@ end
 
 CharacterHandler.Initialize = function(Entity)
     
-
 	for id,v in pairs(Entity.Data.Inventory) do
 		local item = {};
 		item = deepcopy(Wiki.ItemInfo[v.Name]);
 		item.Name = v.Name;
-        item.Type = v.Type; 
 		item.Id = id;
 		item.Attributes = v.Attributes;
         
@@ -51,6 +49,22 @@ CharacterHandler.Initialize = function(Entity)
 
 		ItemFactory.CreateItem(Entity, item);
 	end;
+
+    local addCon = Entity.Character.Rig.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") and child:GetAttribute("Type") == "Weapon" then
+            Entity.Character.Weapon._weapon = child.Name;
+        end
+    end)
+
+    local remCon = Entity.Character.Rig.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") and child:GetAttribute("Type") == "Weapon" then
+            Entity.Character.Weapon._weapon = nil;
+        end
+    end)
+
+    table.insert(Entity.Character._Connections, addCon);
+    table.insert(Entity.Character._Connections, remCon);
+
 end;
 
 return CharacterHandler;

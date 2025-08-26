@@ -26,8 +26,8 @@ return function(Params)
 	if not Entity.Combat:CanUse() then return end;
 	if Args.held then return end;
     
-    local WeaponInfo = WeaponInfos[Character._weapon or "TesterSword"];
-	
+    local WeaponInfo = WeaponInfos[Character.Weapon._weapon or "Fist"];
+
 	if tick() >= comboResetTime + Entity.Combat.ComboTick then
 		Entity.Combat.Combo = 1
 	end
@@ -68,6 +68,7 @@ return function(Params)
 	hitbox.Debug = true;
 	hitbox.onTouch = function(EnemyEntity)
 		print(EnemyEntity);
+		EnemyEntity:TakeDamage({}, Entity);
 	end
 
 	hitbox:FireFor(0.03);

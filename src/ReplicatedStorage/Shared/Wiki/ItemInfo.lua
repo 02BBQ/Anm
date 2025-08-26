@@ -6,7 +6,7 @@ local Assets = Shared.Assets;
 local itemInfo = 
 {
     -- Weapons
-    ["SuperDreamySword"] = {
+    ["TesterSword"] = {
         Description = "A sword that dreams of being a legendary weapon.",
         Type = "Weapon",
         Rarity = "Legendary",
