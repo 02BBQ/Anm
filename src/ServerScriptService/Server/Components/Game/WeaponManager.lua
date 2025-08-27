@@ -11,6 +11,8 @@ local SharedComponents = Shared.Components;
 local Server = ServerScriptService.Server;
 local Storage = ServerStorage.Storage;
 
+local WeaponModels = Storage.WeaponModel;
+
 local Auxiliary = require(Shared.Utility.Auxiliary);
 local Attribute = require(Shared.Utility.Attribute);
 local Wiki = require(Shared.Wiki);
@@ -24,9 +26,9 @@ WeaponManager.__tostring = function(self )
 	return self._weapon or "N/A";
 end;
 
-WeaponManager.new = function(Entity)
+WeaponManager.new = function(Character)
 	local self = setmetatable({
-		Parent = Entity;
+		Parent = Character;
 		Equipped = false;
 		_weaponModel = nil;
 		_weapon = nil;
@@ -51,57 +53,55 @@ function WeaponManager:ToggleEquip()
 	end;
 end;
 
-function WeaponManager:Equip()
-	if self.Equipped then return end; 
-	if not WeaponInfo[self.Parent.Character.Weapon] then return end;
-	local CharacterManager = self.Parent.Character;
-	local Info = WeaponInfo[self.Parent.Character.Weapon];
+function WeaponManager:Equip(name)
+	local CharacterValues = Attribute(self.Parent.Rig);
+	local Info = WeaponInfo[name];
+	if CharacterValues.Equipped then return end; 
+	if not Info then return end;
+	local CharacterManager = self.Parent;
 
 	if self._weapon then
 		self._weapon = nil;
 	end
-	
-	Debris:AddItem(self._weaponModel, 0);
-	
-	self.Equipped = self.Parent.Character.Weapon;
-	CharacterManager.Rig:SetAttribute("Equipped", self.Equipped);
 
-	self._weapon = require(ServerScriptService.Server.Weapon[self.Parent.Character.Weapon]).new(self.Parent);
-	
-	-- local WeaponModelBase = WeaponModels[self.Parent.Character.Weapon];
-	-- if WeaponModelBase then 
-	-- 	local WeaponModel = WeaponModelBase:Clone();
-	-- 	for i,limb in pairs(WeaponModel:GetChildren()) do
-	-- 		local Handle = limb:FindFirstChildOfClass("BasePart") or limb:FindFirstChildOfClass("Part");
-	-- 		Handle:FindFirstChildOfClass("Motor6D").Part0 = CharacterManager.Rig[limb.Name];
-	-- 		self._weaponModel = WeaponModel
-	-- 	end
-	-- 	WeaponModel.Parent = CharacterManager.Rig;
+	CharacterValues.Equipped = true;
+
+	--self._weapon = require(ServerScriptService.Server.Weapon[self.Parent.Character.Weapon]).new(self.Parent);
+	self._weapon = name;
+
+	local WeaponModelBase = WeaponModels[self._weapon];
+	if WeaponModelBase then 
+		local WeaponModel = WeaponModelBase:Clone();
+		for i,limb in pairs(WeaponModel:GetChildren()) do
+			print(limb);
+			local Handle = limb:FindFirstChildOfClass("MeshPart") or limb:FindFirstChildOfClass("Part");
+			Handle:FindFirstChildOfClass("Motor6D").Part1 = CharacterManager.Rig[limb.Name];
+			self._weaponModel = WeaponModel
+		end
+		WeaponModel.Parent = CharacterManager.Rig;
+	end;
+
+	-- local equipAnimID = Info.Anim.Equip;
+	-- if equipAnimID then
+	-- 	local Animation = Instance.new("Animation");
+	-- 	Animation.AnimationId = equipAnimID;
+	-- 	local AnimationTrack = CharacterManager.Rig.Humanoid:LoadAnimation(Animation);
+	-- 	AnimationTrack:Play();
+	-- 	AnimationTrack.Stopped:Wait();
+	-- 	Animation:Destroy();
 	-- end;
 
-	local equipAnimID = Info.Anim.Equip;
-	if equipAnimID then
-		local effect = self.Parent.EffectReplicator:CreateEffect("UsingMove");
-		local Animation = Instance.new("Animation");
-		Animation.AnimationId = equipAnimID;
-		local AnimationTrack = CharacterManager.Rig.Humanoid:LoadAnimation(Animation);
-		AnimationTrack:Play();
-		AnimationTrack.Stopped:Wait();
-		Animation:Destroy();
-		effect:Destroy();
-	end;
+	-- local idleAnimID = Info.Anim.Idle;
+	-- if idleAnimID then
+	-- 	local Animation = Instance.new("Animation"); Animation.AnimationId = idleAnimID;
+	-- 	local AnimationTrack = CharacterManager.Rig.Humanoid:LoadAnimation(Animation);
+	-- 	AnimationTrack:Play();
+	-- 	AnimationTrack.Stopped:Connect(function()	
+	-- 		Animation:Destroy();
+	-- 	end);
 
-	local idleAnimID = Info.Anim.Idle;
-	if idleAnimID then
-		local Animation = Instance.new("Animation"); Animation.AnimationId = idleAnimID;
-		local AnimationTrack = CharacterManager.Rig.Humanoid:LoadAnimation(Animation);
-		AnimationTrack:Play();
-		AnimationTrack.Stopped:Connect(function()	
-			Animation:Destroy();
-		end);
-
-		self._animTracks["Idle"] = AnimationTrack;
-	end;
+	-- 	self._animTracks["Idle"] = AnimationTrack;
+	-- end;
 end; 
 
 function WeaponManager:LightAttack(Entity, Args)
@@ -117,38 +117,36 @@ function WeaponManager:Critical(Entity, Args)
 end
 
 function WeaponManager:Unequip() 
-	if not self.Equipped then return end;
-	if not WeaponInfo[self.Parent.Character.Weapon] then return end;
-	local CharacterManager = self.Parent.Character;
-	local Info = WeaponInfo[self.Parent.Character.Weapon];
+	local CharacterValues = Attribute(self.Parent.Rig);
+	local Info = WeaponInfo[self._weapon];
+	if not CharacterValues.Equipped then return end;
+	if not Info then return end;
+	local CharacterManager = self.Parent;
 
-	local equipAnimID = Info.Anim.Unequip;
-	if equipAnimID then
-		local effect = self.Parent.EffectReplicator:CreateEffect("UsingMove");
-		local Animation = Instance.new("Animation");
-		Animation.AnimationId = equipAnimID;
-		local AnimationTrack = CharacterManager.Rig.Humanoid:LoadAnimation(Animation);
-		AnimationTrack:Play();
-		AnimationTrack.Stopped:Wait();
-		Animation:Destroy();
-		effect:Destroy();
-	end;
+	-- local equipAnimID = Info.Anim.Unequip;
+	-- if equipAnimID then
+	-- 	local Animation = Instance.new("Animation");
+	-- 	Animation.AnimationId = equipAnimID;
+	-- 	local AnimationTrack = CharacterManager.Rig.Humanoid:LoadAnimation(Animation);
+	-- 	AnimationTrack:Play();
+	-- 	AnimationTrack.Stopped:Wait();
+	-- 	Animation:Destroy();
+	-- end;
 
-	self._weapon:Destroy();
+	-- self._weapon:Destroy();
 	if self._weapon then
 		self._weapon = nil;
 	end
 
-	-- if self._weaponModel then
-	-- 	self._weaponModel:Destroy();
-	-- end;
+	if self._weaponModel then
+		self._weaponModel:Destroy();
+	end;
 
 	if self._animTracks["Idle"] then
 		self._animTracks["Idle"]:Stop();
 	end;
 
-	self.Equipped = nil;
-	CharacterManager.Rig:SetAttribute("Equipped", self.Equipped);
+	CharacterValues.Equipped = false;
 end;
 
 function WeaponManager:Destroy()

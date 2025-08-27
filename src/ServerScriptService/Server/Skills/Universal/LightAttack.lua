@@ -62,13 +62,11 @@ return function(Params)
 	
 	local hitbox = Entity:CreateHitbox()
 	hitbox.instance = Entity.Character.Root;
-	hitbox.ignore = { Entity.Character.Rig };
 	hitbox.size = WeaponInfo.Size;
 	hitbox.offset = WeaponInfo.Offset;
-	hitbox.Debug = true;
-	hitbox.onTouch = function(EnemyEntity)
-		print(EnemyEntity);
-		EnemyEntity:TakeDamage({}, Entity);
+	hitbox.debug = false;
+	hitbox.onHit = function(EnemyEntity)
+		EnemyEntity.Combat:TakeDamage({Damage = WeaponInfo.Damage}, Entity);
 	end
 
 	hitbox:FireFor(0.03);

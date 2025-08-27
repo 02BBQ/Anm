@@ -25,35 +25,35 @@ Hitbox.new = function(CasterEntity: {}?)
 		
 		_DetectionBlacklist = {};
 		
-		Caster = CasterEntity;
-		Detected = {};
+		caster = CasterEntity;
+		detected = {};
 		
 	}, Hitbox);
 	
-	self.Shape = 'Box'; -- Provide PartType enum
+	self.shape = 'Box'; -- Provide PartType enum
 	
-	self.IgnorePrevious = true; -- Ignores entities that have already been stored in the hitbox object if detected again
-	self.IgnoreCaster = true; -- Ignores entity that casted hitbox
-	self.IgnoreRagdolled = true; -- Ignores ragdolled entities
-	self.IgnoreDead = false; -- Ignore dead entities
-	self.IgnoredEntities = {}; -- Ignores any detected entities if they're in this table
+	self.ignorePrevious = true; -- Ignores entities that have already been stored in the hitbox object if detected again
+	self.ignoreCaster = true; -- Ignores entity that casted hitbox
+	self.ignoreRagdolled = true; -- Ignores ragdolled entities
+	self.ignoreDead = false; -- Ignore dead entities
+	self.ignoredEntities = {}; -- Ignores any detected entities if they're in this table
 	
-	self.Single = false; -- Only detect 1 entity
+	self.single = false; -- Only detect 1 entity
 	
-	self.AccurateCFrame = false; -- If root is a humanoidrootpart, hitbox requests HRP CFrame from client, not recommended as there can be significant delays
+	self.accurateCFrame = false; -- If root is a humanoidrootpart, hitbox requests HRP CFrame from client, not recommended as there can be significant delays
 	
-	self.Root = nil; -- Root of hitbox (Vector3 | CFrame | Part)
-	self.Offset = CFrame.new(0,0,0); -- CFrame offset
-	self.Size = Vector3.one*5; -- Hitbox size
+	self.root = nil; -- Root of hitbox (Vector3 | CFrame | Part)
+	self.offset = CFrame.new(0,0,0); -- CFrame offset
+	self.size = Vector3.one*5; -- Hitbox size
 	
-	self.ZMiddlePoint = true; -- Add middle point of Z scale to offset
+	self.zMiddlePoint = false; -- Add middle point of Z scale to offset
 	
-	self.ClientMagnitudeTolerance = 10; -- Maximum distance between clients provided CFrame of HRP and servers HRP CFrame
+	self.clientMagnitudeTolerance = 10; -- Maximum distance between clients provided CFrame of HRP and servers HRP CFrame
 	
-	self.OnHit = nil; -- Optional callback function
-	self.Debug = false; -- Creates transparent part to display hitbox
+	self.onHit = nil; -- Optional callback function
+	self.debug = false; -- Creates transparent part to display hitbox
 	
-	self.Hit = false; -- Sets to true once a hit has been detected
+	self.hit = false; -- Sets to true once a hit has been detected
 	
 	return self;
 end;
@@ -68,7 +68,7 @@ function Hitbox:GetParams()
 	EntityOverlapParams.FilterType = Enum.RaycastFilterType.Include;
 	EntityOverlapParams.CollisionGroup = 'Hitbox';
 	
-	if self.Single then
+	if self.single then
 		EntityOverlapParams.MaxParts = 1;
 	end;
 	
@@ -76,22 +76,22 @@ function Hitbox:GetParams()
 end;
 
 local function FireHitbox(self)
-	local HitboxRoot = (typeof(self.Root) == 'Instance' and self.Root.CFrame) or (typeof(self.Root) == 'Vector3' and CFrame.new(self.Root)) or (typeof(self.Root) == 'CFrame' and self.Root);
+	local HitboxRoot = (typeof(self.root) == 'Instance' and self.root.CFrame) or (typeof(self.root) == 'Vector3' and CFrame.new(self.root)) or (typeof(self.root) == 'CFrame' and self.root);
 	if not HitboxRoot then
-		HitboxRoot = (self.AccurateCFrame and self.Caster.Character:GetRootCFrame(self.ClientMagnitudeTolerance)) or self.Caster.Character.Root.CFrame;
+		HitboxRoot = (self.accurateCFrame and self.caster.Character:GetRootCFrame(self.clientMagnitudeTolerance)) or self.caster.Character.Root.CFrame;
 	end;
 
-	local Offsetting: CFrame = self.Offset;
-	if self.ZMiddlePoint then
-		Offsetting *= CFrame.new(0,0,-(self.Size.Z/2));
+	local Offsetting: CFrame = self.offset;
+	if self.zMiddlePoint then
+		Offsetting *= CFrame.new(0,0,-(self.size.Z/2));
 	end;
 
-	local HitboxPart: Part = Shared.Hitboxes[self.Shape]:Clone();
+	local HitboxPart: Part = Shared.Hitboxes[self.shape]:Clone();
 
 	HitboxPart.CFrame = HitboxRoot * Offsetting;
-	HitboxPart.Size = self.Size;
+	HitboxPart.Size = self.size;
 
-	self.CurrentDetected = {};
+	self.currentDetected = {};
 
 	local Touching = workspace:GetPartsInPart(HitboxPart, self:GetParams());
 	for _,v: Part in Touching do
@@ -100,11 +100,11 @@ local function FireHitbox(self)
 	
 	HitboxPart:Destroy()
 
-	if self.Debug then
+	if self.debug then
 		local DebugPart = HitboxPart:Clone();
 		DebugPart.Material = Enum.Material.SmoothPlastic;
 		DebugPart.Color = Color3.new(1,0,0);
-		DebugPart.Transparency = .7;
+		DebugPart.Transparency = .9;
 		DebugPart.CastShadow = false;
 
 		DebugPart.Parent = workspace.World.Debris;
@@ -138,14 +138,14 @@ end;
 function Hitbox:FireConsecutive(Amount: number, FireDelay: number, Yielding: boolean?, NoCallYield: boolean?)
 	local function Action(self)
 		for i = 1,Amount do
-			if self.Completed == true then
+			if self.completed == true then
 				break;
 			end;
 			
 			self:Fire(not NoCallYield);
 			task.wait(FireDelay);
 		end;
-		self.Completed = true;
+		self.completed = true;
 	end;
 	
 	if Yielding then
@@ -157,10 +157,10 @@ end;
 
 function Hitbox:AnticipateHit(Duration: number)
 	task.wait(Duration);
-	if not self.Completed then
-		repeat task.wait(0.1) until self.Completed;
+	if not self.completed then
+		repeat task.wait(0.1) until self.completed;
 	end;
-	return self.Hit;
+	return self.hit;
 end;
 
 function Hitbox:Parse(HitboxPart: Part)	
@@ -174,32 +174,32 @@ function Hitbox:Parse(HitboxPart: Part)
 	
 	local FoundEntity = _G.FindEntity(Character);
 	if not FoundEntity then return end;
-	if self.IgnoreCaster and FoundEntity == self.Caster then return end;
+	if self.ignoreCaster and FoundEntity == self.caster then return end;
 	
-	if self.Single and (#self.CurrentDetected > 0 or self.Hit) then
+	if self.single and (#self.currentDetected > 0 or self.hit) then
 		return;
 	end;
 	
-	if table.find(self.CurrentDetected, FoundEntity) then return end;
+	if table.find(self.currentDetected, FoundEntity) then return end;
 	if self._DetectionBlacklist[FoundEntity] then return end;
 	if not FoundEntity.Combat.Detectable then return end;
-	if self.IgnorePrevious and table.find(self.Detected, FoundEntity) then return end;
-	if self.IgnoreRagdolled and FoundEntity.Character.Ragdolled then return end;
-	if not FoundEntity.Character.Alive and self.IgnoreDead then return end;
-	if #self.IgnoredEntities ~= 0 then
-		if table.find(self.IgnoredEntities, FoundEntity) then
+	if self.ignorePrevious and table.find(self.detected, FoundEntity) then return end;
+	if self.ignoreRagdolled and FoundEntity.Character.Ragdolled then return end;
+	if not FoundEntity.Character.Alive and self.ignoreDead then return end;
+	if #self.ignoredEntities ~= 0 then
+		if table.find(self.ignoredEntities, FoundEntity) then
 			return;
 		end;
 	end;
 	
-	table.insert(self.CurrentDetected, FoundEntity);
-	table.insert(self.Detected, FoundEntity);
+	table.insert(self.currentDetected, FoundEntity);
+	table.insert(self.detected, FoundEntity);
 	
-	if self.OnHit then 
-		task.spawn(self.OnHit, FoundEntity);
+	if self.onHit then 
+		task.spawn(self.onHit, FoundEntity);
 	end;
 	
-	self.Hit = true;
+	self.hit = true;
 	
 end;
 

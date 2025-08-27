@@ -163,4 +163,12 @@ for _,v in pairs(script:GetChildren()) do
 	end;
 end;
 
+Auxiliary.SetCollisionGroups = function(Character, Group)
+	for Index, Part: BasePart in ipairs(Character:GetChildren()) do
+		if Part:IsA'BasePart' then
+			Part.CollisionGroup = Group;
+		end
+	end
+end
+
 return Auxiliary;

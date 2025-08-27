@@ -8,6 +8,7 @@ local RunService = game:GetService('RunService');
 local TweenService = game:GetService('TweenService');
 
 local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary);
+local Attirbute = require(ReplicatedStorage.Shared.Utility.Attribute);
 local Ragdoll = require(script.Ragdoll);
 local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
 local Race = require(ReplicatedStorage.Shared.Components.Race);
@@ -32,6 +33,11 @@ CharacterManager.new = function(Entity)
 		
 		_Connections = {};
 		RagdollQueue = {};
+
+		Ragdolled = false;
+		Knocked = false;
+
+		Attirbutes = nil;
 		
 		OnRespawn = Signal.new();
 	}, CharacterManager);
@@ -56,6 +62,13 @@ function CharacterManager:Respawn()
 	-- Entity.Weapon.Equipped = false;
 end
 
+function CharacterManager:Knock()
+	local Entity = self.Parent;
+	self.Knocked = true;
+	self:Ragdoll(true);
+	Entity.Combat:Active(false);
+end
+
 function CharacterManager:Ragdoll(Val, Absolute: boolean?)
 	local IsDuration = typeof(Val) == 'number';
 	if self.Ragdolled then
@@ -75,15 +88,14 @@ end;
 function CharacterManager:InitCharacter()
 	local Entity = self.Parent
 	
-	local SpawnCon = Entity._Connections["_Respawn"]
-	if SpawnCon then
-		SpawnCon:Disconnect();
-	end
-	
-	self.RagdollQueue = {};
+	table.clear(self.RagdollQueue);
 	
 	local Rig = self.Rig;
 	self.Alive = true;
+
+	self.Attirbutes = Attirbute(Rig);
+	table.clear(self.RagdollQueue);
+	self.Ragdolled = false;
 
 	-- Character Setup 시스템 실행
 	InitializeManager.Initialize(Entity);
@@ -95,11 +107,7 @@ function CharacterManager:InitCharacter()
 
 	self.Humanoid.BreakJointsOnDeath = false;
 
-	for _,part in pairs(Rig:GetChildren()) do
-		if part:IsA("BasePart") then
-			part.CollisionGroup = "Entity";
-		end;
-	end;
+	Auxiliary.Shared.SetCollisionGroups(Rig, "Entity");
 
 	self.Parent.Animator:Cache();
 	
@@ -108,9 +116,7 @@ function CharacterManager:InitCharacter()
 	self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
 	self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, false);
 	
-	Entity._Connections["_Respawn"] = Rig.Humanoid.Died:Connect(function()
-		Entity._Connections["_Respawn"]:Disconnect();
-		
+	Rig.Humanoid.Died:Connect(function()
 		for i,con in pairs(self._Connections) do
 			con:Disconnect();	
 		end

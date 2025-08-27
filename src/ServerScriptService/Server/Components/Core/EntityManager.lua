@@ -4,8 +4,8 @@ local ReplicatedStorage = game:GetService('ReplicatedStorage');
 local ServerStorage = game:GetService("ServerStorage");
 
 local Components = ServerScriptService.Server.Components
-local EntityTemplates = ServerStorage
 local Storage = ServerStorage.Storage;
+local EntityTemplates = Storage.Mobs;
 
 local ProfileHandler = require(Components.Data.ProfileHandler);
 local CombatManager = require(Components.Game.CombatManager);

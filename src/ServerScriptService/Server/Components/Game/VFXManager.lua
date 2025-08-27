@@ -46,13 +46,13 @@ function VFXManager:Fire(ModulePath: string, Data: {}, Receiving: {} | Player | 
 		Receiving = Network.AllPlayers();
 	end
 
-	if Data then
-		for i,v: {}? in Data do
-			if typeof(v) ~= 'table' then continue end;
-			if v._Class ~= 'Entity' then continue end;
-			Data[i] = v.VFX:GetClientEntity();
-		end;
-	end;
+	-- if Data then
+	-- 	for i,v: {}? in Data do
+	-- 		if typeof(v) ~= 'table' then continue end;
+	-- 		if v._Class ~= 'Entity' then continue end;
+	-- 		Data[i] = v.VFX:GetClientEntity();
+	-- 	end;
+	-- end;
 
 	--Send to designated VFX channel
 	Data["Caster"] = ClientEntity

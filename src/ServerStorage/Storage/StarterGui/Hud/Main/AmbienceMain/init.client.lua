@@ -18,6 +18,8 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
 
+local MusicVolumeMultiplier = 0;
+
 
 local currentZone = {};
 local currentRegion = "Nothing";
@@ -44,7 +46,7 @@ function NoRegion()
 	if not sound then return end;
 
 	sound = sound.Day:Clone()
-	local originalVolume = sound.Volume;
+	local originalVolume = sound.Volume * MusicVolumeMultiplier;
 
 	local endLabel = Instance.new("BindableEvent")
 	sound.Volume = 0
@@ -112,7 +114,7 @@ function SetRegion(container)
 	if not sound then return end;
 
 	sound = sound.Day:Clone()
-	local originalVolume = sound.Volume;
+	local originalVolume = sound.Volume * MusicVolumeMultiplier;
 
 	local endLabel = Instance.new("BindableEvent")
 	sound.Volume = 0

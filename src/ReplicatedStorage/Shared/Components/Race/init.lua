@@ -56,8 +56,16 @@ end
 
 function module.Initialize(Entity)
 	local character = Entity.Character;
+
+	local Race;
+
+	if not Entity.Player then
+		Race = module.Choose();
+	else
+		Race = Entity.Data.Race;
+	end
 	
-	Races[Entity.Data.Race]["Initialize"](Entity);
+	Races[Race]["Initialize"](Entity);
 end
 
 return module

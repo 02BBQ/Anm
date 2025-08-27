@@ -34,8 +34,6 @@ CombatManager.new = function(Entity: {})
 		
 		Timers = {};
 		
-		DamageMultiplier = 1;
-		
 		InCombat = false;
 		_Active = true;
 		
@@ -93,26 +91,6 @@ function CombatManager:CanUse()
 	end
 	return true;
 end
-
-local function GetLowestValue(Ind: number, Tab: {})
-	if Auxiliary.Shared.Count(Tab) == 0 then
-		return;
-	end;
-	
-	local Lowest;
-	for _,v in Tab do
-		if not v[Ind] then continue end;
-		if not Lowest then
-			Lowest = v[Ind];
-			continue;
-		end;
-		if v[Ind] < Lowest then
-			Lowest = v[Ind];
-		end;
-	end;
-	
-	return Lowest;
-end;
 
 function CombatManager:Active(bool: boolean)
 	self._Active = bool;
@@ -195,12 +173,10 @@ function CombatManager:RemoveParryingFrame()
 	table.remove(self._ParryingQueue, 1);
 end;
 
-function CombatManager:TakeDamage(DamageData, sender)
-	local BridgeNet = shared.Define.bridge;
+function CombatManager:TakeDamage(DamageData, attackerEntity)
 	local entity = self.Parent;
-	local attackerEntity = sender;
 
-	local Victim = entity.Character.Rig;
+	local rig = entity.Character.Rig;
 	local attacker = attackerEntity.Character.Rig;
 
 	local VFX : string? = DamageData.VFX;
@@ -210,22 +186,18 @@ function CombatManager:TakeDamage(DamageData, sender)
 
 	local Type : string? = DamageData.Type;
 
-	local EnemyHumanoid = entity.Character.Humanoid;
-
 	local function OnHit()
 
 		if self:IsParrying() and not DamageData.NotParryable then
 			entity.Cooldowns:Stop('Parry', 1);
 			attackerEntity.Combat:AttemptCancel(DamageData.Cancel or 1);
 			attackerEntity.EffectReplicator:CreateEffect("Stunned"):Debris();
-			_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
+			rig.VFX:Fire("HitEffect",
 				{
-					Victim = Victim;
-					Origin = Victim.HumanoidRootPart;
 					Root = attacker.HumanoidRootPart;
 					Type = "Parry";
 					Sound = "Hit/Parry";
-				}})
+				}, BridgeNet.AllPlayers())
 
 			return	end
 
@@ -240,14 +212,12 @@ function CombatManager:TakeDamage(DamageData, sender)
 				self:BlockBreak();
 			else
 				self.Parent.Animator:Fetch('Universal/Block/Hurt/'..math.random(1,3)):Play();
-				_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
-					{
-						Victim = Victim;
-						Origin = Victim.HumanoidRootPart;
-						Root = attacker.HumanoidRootPart;
-						Type = "Block";
-						Sound = "Hit/Block";
-					}})
+				rig.VFX:Fire("HitEffect",
+				{
+					Root = attacker.HumanoidRootPart;
+					Type = "Parry";
+					Sound = "Hit/Parry";
+				}, BridgeNet.AllPlayers())
 				return;
 			end
 		end
@@ -260,7 +230,7 @@ function CombatManager:TakeDamage(DamageData, sender)
 		end
 
 		if DamageData.OnHit then
-			DamageData.OnHit(Victim)
+			DamageData.OnHit(rig)
 		end
 
 		if DamageData.Ragdoll then
@@ -287,22 +257,25 @@ function CombatManager:TakeDamage(DamageData, sender)
 			--end)
 		end
 
-		if not EnemyHumanoid then return end
-
 		if Damage then
-			EnemyHumanoid:TakeDamage(Damage)
+			if entity.Character.Humanoid.Health - Damage <= 1 then
+				entity.Character.Humanoid.Health = 1;
+				entity.Character:Knock();
+			else
+				entity.Character.Humanoid.Health -= Damage;
+			end
 
 			if VFX then
-				_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
+				rig.VFX:Fire("HitEffect",
 					{
-						Victim = Victim;
-						Origin = Victim.HumanoidRootPart;
+						Victim = rig;
+						Origin = rig.HumanoidRootPart;
 						Root = attacker.HumanoidRootPart;
 						Type = VFX;
 						Damage = Damage;
 						Sound = DamageData.Sound;
 						HitShake = true;
-					}})
+					}, BridgeNet.AllPlayers())
 			end
 
 			entity.Animator:Fetch('Universal/Hurt'..random:NextInteger(1,3)):Play()
@@ -419,27 +392,6 @@ function CombatManager:AttemptCancel(Level: number)
 	
 	return true;
 end;
-
-function CombatManager:IsActive()
-	local Acting = self.Parent.Character.Rig:GetAttribute("Acting")
-	local Stunned = self.Parent.Character.Rig:GetAttribute("Stunned")
-	local Ragdolled = self.Parent.Character.Rig:GetAttribute("Ragdolled")
-	
-	if Acting then 
-		return false;
-	end
-	if Stunned then 
-		return false;
-	end
-	if Ragdolled then 
-		return false;
-	end
-	if self.Acting then
-		return false;
-	end
-	
-	return true;
-end
 
 function CombatManager:Destroy()
 	self._Trove:Destroy();

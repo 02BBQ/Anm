@@ -90,6 +90,10 @@ _use:Connect(function(player, args)
         Entity.Combat:Block(held);
     elseif action == "M1" then
         HandleM1(Entity, args);
+    elseif action == "Carry" then
+        Skills['Action/Carry']({Caster = Entity, Args = data});
+    elseif action == "Grip" then
+        Skills['Action/Grip']({Caster = Entity, Args = data});
     end
 end);
 

@@ -193,3 +193,5 @@ for _,v in pairs(workspace.World.Alive:GetChildren()) do
 end
 
 workspace.World.Alive.ChildAdded:Connect(characterInitialize)
+
+EntityManager.Spawn("Sans_0909").Character.Rig.Parent = workspace.World.Alive;

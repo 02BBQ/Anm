@@ -23,6 +23,8 @@ local initialize = function()
 	InputHandler:BindAction(Enum.KeyCode.F, ActionHandler.Block);
 	InputHandler:BindAction(Enum.KeyCode.Q, ActionHandler.Dash);
 	InputHandler:BindAction(Enum.KeyCode.W, ActionHandler.Sprint);
+	InputHandler:BindAction(Enum.KeyCode.V, ActionHandler.Carry);
+	InputHandler:BindAction(Enum.KeyCode.B, ActionHandler.Grip);
 
 	require(ReplicatedStorage:WaitForChild"CmdrClient"):SetActivationKeys({
 		Enum.KeyCode.F2,

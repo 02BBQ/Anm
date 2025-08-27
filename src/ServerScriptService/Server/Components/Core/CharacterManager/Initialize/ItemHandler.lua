@@ -52,13 +52,13 @@ CharacterHandler.Initialize = function(Entity)
 
     local addCon = Entity.Character.Rig.ChildAdded:Connect(function(child)
         if child:IsA("Tool") and child:GetAttribute("Type") == "Weapon" then
-            Entity.Character.Weapon._weapon = child.Name;
+            Entity.Character.Weapon:Equip(child.Name);
         end
     end)
 
-    local remCon = Entity.Character.Rig.ChildAdded:Connect(function(child)
+    local remCon = Entity.Character.Rig.ChildRemoved:Connect(function(child)
         if child:IsA("Tool") and child:GetAttribute("Type") == "Weapon" then
-            Entity.Character.Weapon._weapon = nil;
+            Entity.Character.Weapon:Unequip(child.Name);
         end
     end)
 

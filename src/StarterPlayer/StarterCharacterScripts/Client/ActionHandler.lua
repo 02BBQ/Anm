@@ -126,5 +126,14 @@ function ActionComponent:Sprint(held: boolean)
 	lastPressTime = currentTime
 end
 
+function ActionComponent:Carry(held: boolean)
+	local data = {held = held};
+	_use:Fire({"Carry", data})
+end
+
+function ActionComponent:Grip(held: boolean)
+	local data = {held = held};
+	_use:Fire({"Grip", data})
+end
 
 return ActionComponent
