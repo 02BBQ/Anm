@@ -116,11 +116,10 @@ function CombatManager:AddCombatStatus()
 end;
 
 function CombatManager:Block(held: boolean?)
-	-- if held then return end
 	local Entity = self.Parent;
 
 	self._Block.Animation = Entity.Animator:Fetch('Universal/Block/Main');
-	-- print(held);
+
 	if held then
 		if not self:CanUse() then return end
 		self:Parry();
@@ -192,7 +191,7 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 			entity.Cooldowns:Stop('Parry', 1);
 			attackerEntity.Combat:AttemptCancel(DamageData.Cancel or 1);
 			attackerEntity.EffectReplicator:CreateEffect("Stunned"):Debris();
-			rig.VFX:Fire("HitEffect",
+			entity.VFX:Fire("HitEffect",
 				{
 					Root = attacker.HumanoidRootPart;
 					Type = "Parry";
@@ -212,7 +211,7 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 				self:BlockBreak();
 			else
 				self.Parent.Animator:Fetch('Universal/Block/Hurt/'..math.random(1,3)):Play();
-				rig.VFX:Fire("HitEffect",
+				entity.VFX:Fire("HitEffect",
 				{
 					Root = attacker.HumanoidRootPart;
 					Type = "Parry";
@@ -266,7 +265,7 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 			end
 
 			if VFX then
-				rig.VFX:Fire("HitEffect",
+				entity.VFX:Fire("HitEffect",
 					{
 						Victim = rig;
 						Origin = rig.HumanoidRootPart;

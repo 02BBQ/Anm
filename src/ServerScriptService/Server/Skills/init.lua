@@ -16,7 +16,7 @@ while true do
 	end;
 	LastIndex = index;
 	if value:IsA("ModuleScript") then
-		local Path = Auxiliary.Shared.GetPath(value, script)
+		local Path = value.Name;--Auxiliary.Shared.GetPath(value, script)
 		table.insert(Check1, value);
 		task.spawn(function()
 			Cache[Path] = require(value);

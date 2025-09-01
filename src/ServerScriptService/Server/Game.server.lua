@@ -198,3 +198,4 @@ end
 workspace.World.Alive.ChildAdded:Connect(characterInitialize)
 
 EntityManager.Spawn("Sans_0909").Character.Rig.Parent = workspace.World.Alive;
+EntityManager.Spawn("Block_Sans").Character.Rig.Parent = workspace.World.Alive;

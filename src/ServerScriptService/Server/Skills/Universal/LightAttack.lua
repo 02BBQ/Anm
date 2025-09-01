@@ -70,7 +70,7 @@ return function(Params)
 			Damage = WeaponInfo.Damage;
 			Sound = "HitSounds"
 		}
-		EnemyEntity.Combat:TakeDamage({DamageData}, Entity);
+		EnemyEntity.Combat:TakeDamage(DamageData, Entity);
 	end
 
 	hitbox:FireFor(0.03);

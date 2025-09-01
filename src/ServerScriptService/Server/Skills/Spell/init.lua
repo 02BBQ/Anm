@@ -14,7 +14,9 @@ local random = Random.new();
 
 Spell.CastSign = 3;
 Spell.Cooldown = 5;
+Spell.Name = script.Name;
 Spell.ManaCost = 0;
+Spell.isHeldVariant = false;
 
 function Spell:OnCast()
 end
@@ -29,7 +31,11 @@ function Spell:ManaCheck()
     return;
 end
 
-function Spell:CastSigns(Entity)
+function Spell:CastSigns(Entity, Args)
+    if not Args["held"] then
+        return 
+    end;
+    
     for i = 1, self.CastSign do
         local CastTrack: AnimationTrack = Entity.Animator:Fetch('Universal/Cast/Sign'..i);
         Sound.Spawn("clickfast", Entity.Character.Root, 2, {
@@ -45,17 +51,31 @@ end
 function Spell:ActivateSpell(Entity, Args)
 	assert(Entity, "Entity is not set for the spell");
 
+    if not self.isHeldVariant then
+        if Args["held"] == false then
+            return;
+        end;
+    end;
+
     if not Entity.Combat:CanUse() then
         return;
     end
 
-    Entity.Combat:Active(false);
-
-    Spell:CastSigns(Entity);
-
     Entity.Combat:Active(true);
 
+    if not self:CanCast(Entity, Args) then return end;
+
+    self:CastSigns(Entity, Args);
+
     self:OnCast(Entity, Args);
+end
+
+function Spell:CanCast(Entity, Args)
+    if Entity.Cooldowns.OnCooldown[self.Name] then 
+        return false;
+    end;
+
+    return true;
 end
 
 return Spell;	

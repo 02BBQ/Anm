@@ -63,7 +63,7 @@ local function HandleM1(Entity, args)
         if Type == "Spell" then
             -- Handle spell casting
             local spellName = tool.Name;
-            Skills['Spell/' .. spellName]:ActivateSpell(Entity, data);
+            Skills[spellName]:ActivateSpell(Entity, data);
             return;
         end
         if Type == "Weapon" then
@@ -71,7 +71,7 @@ local function HandleM1(Entity, args)
                 Entity.Character.Weapon:LightAttack(Entity, {held = held});
             end
         end
-	else
+	else 
         -- 툴이 없으면 기본 주먹 평타
         if Entity.Character.Weapon then
 			Entity.Character.Weapon:LightAttack(Entity, {held = held});
@@ -91,9 +91,9 @@ _use:Connect(function(player, args)
     elseif action == "M1" then
         HandleM1(Entity, args);
     elseif action == "Carry" then
-        Skills['Action/Carry']({Caster = Entity, Args = data});
+        Skills['Carry']({Caster = Entity, Args = data});
     elseif action == "Grip" then
-        Skills['Action/Grip']({Caster = Entity, Args = data});
+        Skills['Grip']({Caster = Entity, Args = data});
     end
 end);
 

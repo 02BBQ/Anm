@@ -106,7 +106,7 @@ end;
 
 function WeaponManager:LightAttack(Entity, Args)
 	-- 무기가 없으면 기본 주먹 사용
-	local LightAttackSkill = Skills["Universal/LightAttack"];
+	local LightAttackSkill = Skills["LightAttack"];
 	LightAttackSkill({Caster = self.Parent.Parent,Args = Args});
 	return;
 end

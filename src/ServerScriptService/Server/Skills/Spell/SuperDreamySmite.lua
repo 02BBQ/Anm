@@ -6,6 +6,7 @@ local SharedComponents = Shared.Components;
 local Auxiliary = require(Shared.Utility.Auxiliary);
 
 local Spell = require(script.Parent):Extend();
+Spell.Name = script.Name;
 
 local FastCast = require(Shared.Utility.FastCast);
 
