@@ -11,6 +11,7 @@ local Map: Folder = workspace:WaitForChild("World"):WaitForChild('Map');
 
 --// Modules
 local bridgeNet = require(Shared.Components.BridgeNet2);
+local Network = require(Shared.Components.Networking.Network);
 local CharacterHandler = require(script.Parent.CharacterHandler);
 local Auxiliary = require(Shared.Utility.Auxiliary);
 
@@ -84,9 +85,12 @@ local FetchTypes = {
 
 
 
-function ActionComponent.new()
-	local self = setmetatable({}, ActionComponent);
-	return self;
+function ActionComponent.Bind()
+	--local self = setmetatable({}, ActionComponent);
+	Network:BindChannel('Fetch', function(Params)
+		return FetchTypes[Params.Fetching]();
+	end);
+	--return self;
 end
 
 function ActionComponent:LightAttack(held: boolean)

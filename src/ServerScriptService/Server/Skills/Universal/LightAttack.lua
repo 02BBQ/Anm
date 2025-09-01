@@ -64,9 +64,13 @@ return function(Params)
 	hitbox.instance = Entity.Character.Root;
 	hitbox.size = WeaponInfo.Size;
 	hitbox.offset = WeaponInfo.Offset;
-	hitbox.debug = false;
+	hitbox.debug = true;
 	hitbox.onHit = function(EnemyEntity)
-		EnemyEntity.Combat:TakeDamage({Damage = WeaponInfo.Damage}, Entity);
+		local DamageData = {
+			Damage = WeaponInfo.Damage;
+			Sound = "HitSounds"
+		}
+		EnemyEntity.Combat:TakeDamage({DamageData}, Entity);
 	end
 
 	hitbox:FireFor(0.03);

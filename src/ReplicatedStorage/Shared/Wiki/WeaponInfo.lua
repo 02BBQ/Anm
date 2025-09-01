@@ -9,7 +9,9 @@ local itemInfo =
         Animation = "Weapons/Fist";
         SwingSounds = {
             "fistswing";
-        };
+		};
+		
+		HitSounds = {"Hit/Punch1", "Hit/Punch2", "Hit/Punch3"};
 
         Damage = 8;
         SwingSpeed = 1.1;

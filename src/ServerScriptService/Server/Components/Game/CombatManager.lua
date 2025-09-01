@@ -291,14 +291,14 @@ function CombatManager:BlockBreak()
 	cantMove:Debris(1.5);
 	local stunned = self.Parent.EffectReplicator:CreateEffect("TrueStunned");
 	stunned:Debris(1.5);
-	_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
-		{
-			Origin = self.Parent.Character.Root;
-			Victim = self.Parent.Character.Rig;
-			Root = self.Parent.Character.Root;
-			Type = "BlockBreak";
-			Sound = "Hit/GuardBreak";
-		}})
+	--_G.effect:Fire(BridgeNet.AllPlayers(), {"HitEffect",
+	--	{
+	--		Origin = self.Parent.Character.Root;
+	--		Victim = self.Parent.Character.Rig;
+	--		Root = self.Parent.Character.Root;
+	--		Type = "BlockBreak";
+	--		Sound = "Hit/GuardBreak";
+	--	}})
 end
 
 function CombatManager:IsBlocking(DamageData)

@@ -22,17 +22,16 @@ return function(Params)
 	local Character = Entity.Character;
 
 	if Entity.Cooldowns.OnCooldown["Grip"] then return end;
-	if not Entity.Combat:CanUse() then return end;
-	if Args.held then return end;
-
-    local hit = false;
-
+    if Args.held then return end;
     Entity.Character.Grip = Entity.Character.Grip or {}; 
     
     if Entity.Character.Grip.Victim then
         Entity.Character.Grip.Cancel();
         return;
     end
+	if not Entity.Combat:CanUse() then return end;
+
+    local hit = false;
 
     local hitbox = Entity:CreateHitbox()
 	hitbox.instance = Entity.Character.Root;
@@ -42,7 +41,7 @@ return function(Params)
     hitbox.shape = "Sphere";
 	hitbox.onHit = function(EnemyEntity)
         if hit then return end;
-        if EnemyEntity.Character.Knocked then
+        if EnemyEntity.Character.Knocked and EnemyEntity.Character.Alive and not EnemyEntity.Character.Carried and not EnemyEntity.Character.Gripped then
             hit = true;
         else
             return; 
@@ -50,10 +49,12 @@ return function(Params)
 		local GripAnim = Entity.Animator:Fetch('Grip/Grip');
 		GripAnim:Play();
 		
-		GripAnim:AdjustSpeed(5);
+		GripAnim:AdjustSpeed(1);
 		
 		local GrippedAnim = EnemyEntity.Animator:Fetch('Grip/GettingGripped');
 		GrippedAnim:Play();
+
+        EnemyEntity.Character:Ragdoll(false, true);
 
         Entity.Combat:Active(false);
 
@@ -88,6 +89,7 @@ return function(Params)
                 GrippedAnim:Stop();
 					
 				if EnemyEntity.Character then
+                    EnemyEntity.Character:Ragdoll(true);
                     EnemyEntity.Character.Gripped = false;
 					Auxiliary.Shared.SetCollisionGroups(EnemyEntity.Character.Rig, "Entity");
 					
@@ -135,11 +137,10 @@ return function(Params)
         GripCancel.Remove();
         if Entity.Character.Grip.Victim then
             Entity.Character.Grip.Cancel();
-        end
-        if EnemyEntity then
             EnemyEntity.Character.Humanoid.Health = 0;
         end
         Entity.Combat:Active(true);
+        Sound.Spawn("bass.wav", Entity.Character.Root, 3);
 	end
 
 	hitbox:Fire();

@@ -84,7 +84,7 @@ _use:Connect(function(player, args)
 
     local action = args[1];
     local data = args[2];
-    local held = data["held"];
+	local held = data["held"];
 
     if action == "Block" then
         Entity.Combat:Block(held);

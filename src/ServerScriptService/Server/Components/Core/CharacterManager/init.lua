@@ -16,6 +16,7 @@ local ItemFactory = require(ServerScriptService.Server.Components.Misc.ItemFacto
 local InitializeManager = require(script.Initialize);
 local WeaponManager = require(ServerScriptService.Server.Components.Game.WeaponManager);
 local Trove = require(ReplicatedStorage.Shared.Utility.Trove)
+local Network = require(ReplicatedStorage.Shared.Components.Networking.Network);
 
 local CharacterManager = {}
 
@@ -62,6 +63,56 @@ function CharacterManager:Respawn()
 	-- Entity.Weapon.Equipped = false;
 end
 
+function CharacterManager:GetRootCFrame(MagnitudeTolerance: number?)
+	if not self.Parent.Player then
+		return self.Root.CFrame;
+	end;
+
+	local Returning;
+	if self.Parent.Player then
+		local Fetched = Network:Send('Fetch', {Fetching='RootCFrame'}, 1, self.Parent.Player);
+		if Fetched then
+			assert(typeof(Fetched) == 'CFrame', 'Returned value was not a CFrame! Possibly manipulated by the client');
+			if (Fetched.Position - self.Root.Position).Magnitude <= (MagnitudeTolerance or 10) then
+				Returning = Fetched;
+			end;
+		end;
+	end;
+
+	Returning = Returning or self.Root.CFrame;
+	return Returning;
+end;
+
+--function CharacterManager:GetPointingAt()
+--	if not self.Parent.Player then
+--		return self.Root.CFrame * CFrame.new(0,0,-5);
+--	end;
+
+--	local ClientValues: {};
+--	if self.Parent.Player then
+--		local Fetched = _G.BridgeNet2
+--		--local Fetched = Network:Send('Fetch', {Fetching='Pointing'}, 1, self.Parent.Player);
+--		if Fetched then
+--			assert(typeof(Fetched) == 'table', 'Returned value was not a table! Possibly manipulated by the client');
+--			ClientValues = Fetched;
+--		end;
+--	end;
+
+--	if ClientValues then
+--		assert(typeof(ClientValues[1]) == 'CFrame' and typeof(ClientValues[2]) == 'CFrame', 'Invalid type returned');
+--		return table.unpack(ClientValues);
+--	end;
+
+--	return {self.Root.CFrame * CFrame.new(0,0,-5), self.Root.CFrame};
+--end;
+
+--function Characters:GetRelativeCFrame()
+--	local EndCFr: CFrame, RootCFr: CFrame = self:GetPointingAt();
+--	local FacingCFr: CFrame = CFrame.new(RootCFr.Position, EndCFr.Position);
+
+--	return FacingCFr;
+--end;
+
 function CharacterManager:Knock()
 	local Entity = self.Parent;
 	self.Knocked = true;
@@ -88,9 +139,9 @@ end;
 function CharacterManager:InitCharacter()
 	local Entity = self.Parent
 	
-	table.clear(self.RagdollQueue);
 	
 	local Rig = self.Rig;
+	self.Parent.Combat:Active(true);
 	self.Alive = true;
 
 	self.Attirbutes = Attirbute(Rig);

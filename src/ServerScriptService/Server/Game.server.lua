@@ -37,6 +37,9 @@ local Components = ServerScriptService.Server.Components;
 
 local EntityManager = require(Components.Core.EntityManager)
 local Cmdr = require(Components.Admin.Cmdr);
+local Network = require(ReplicatedStorage.Shared.Components.Networking.Network);
+
+Network:OpenDefaultChannels();
 
 Cmdr:RegisterHooksIn(Components.Admin.Hooks)
 Cmdr:RegisterDefaultCommands()

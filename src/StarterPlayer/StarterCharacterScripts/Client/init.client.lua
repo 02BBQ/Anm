@@ -17,6 +17,11 @@ local humanoid = character.Humanoid;
 local lastPressTime = 0
 local doubleTapThreshold = 0.3
 
+humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true);
+humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
+humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
+humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
+
 local initialize = function()
 	InputHandler:BindAction(Enum.UserInputType.MouseButton1, ActionHandler.LightAttack);
 	InputHandler:BindAction(Enum.KeyCode.R, ActionHandler.Critical);
@@ -25,6 +30,8 @@ local initialize = function()
 	InputHandler:BindAction(Enum.KeyCode.W, ActionHandler.Sprint);
 	InputHandler:BindAction(Enum.KeyCode.V, ActionHandler.Carry);
 	InputHandler:BindAction(Enum.KeyCode.B, ActionHandler.Grip);
+	
+	--ActionHandler:Bind();
 
 	require(ReplicatedStorage:WaitForChild"CmdrClient"):SetActivationKeys({
 		Enum.KeyCode.F2,

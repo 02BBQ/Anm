@@ -32,7 +32,7 @@ return function(Params)
     if Entity.Character.Carrying.Carried then
         Entity.Character.Carrying.Cancel();
         return;
-    end
+	end
 
     local hitbox = Entity:CreateHitbox()
 	hitbox.instance = Entity.Character.Root;
@@ -42,11 +42,31 @@ return function(Params)
     hitbox.shape = "Sphere";
 	hitbox.onHit = function(EnemyEntity)
         if hit then return end;
-        if EnemyEntity.Character.Knocked then
+		if EnemyEntity.Character.Knocked and EnemyEntity.Character.Alive and not EnemyEntity.Character.Carriedand and not EnemyEntity.Character.Gripped then
             hit = true;
         else
             return; 
-        end
+		end
+		
+		local PickUpAnim: AnimationTrack = Entity.Animator:Fetch('Universal/Pickup');
+		PickUpAnim:Play();
+
+		local StartCancel = Entity.Combat:CreateCancel(1,function()
+			PickUpAnim:Stop();
+		end)
+
+		PickUpAnim.Stopped:Connect(function()
+			StartCancel.Remove();
+		end)
+
+		task.wait(0.6);
+		if StartCancel.Removed then return end;
+
+		if EnemyEntity.Character.Knocked and EnemyEntity.Character.Alive and not EnemyEntity.Character.Carried and not EnemyEntity.Character.Gripped then
+        else
+            return; 
+		end
+		
         local Carrying = Entity.Animator:Fetch('Universal/Carrying');
         Carrying:Play();
 		local Weld = Instance.new('Weld', Character.Rig);
