@@ -18,10 +18,12 @@ function Spell:OnCast(Entity, Args)
 	hitbox.size = Vector3.new(10,10,50);
 	hitbox.offset = CFrame.new(0,0,-25);
 	hitbox.debug = true;
-    -- hitbox.single = true;
+    hitbox.single = true;
 	hitbox.onHit = function(EnemyEntity)
         Entity.VFX:Fire("Luxinculum", {Action = "start", Target = EnemyEntity:GetClientEntity()});
         task.delay(0.3, function()
+            local bp = Auxiliary.Shared.CreatePosition(EnemyEntity.Character.Root);
+            bp.Position = (Entity.Character.Root.CFrame * CFrame.new(0,0,-3)).p;
             EnemyEntity.Combat:TakeDamage({Damage = 25}, Entity);
         end)
 	end

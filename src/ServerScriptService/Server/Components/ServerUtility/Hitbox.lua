@@ -68,9 +68,9 @@ function Hitbox:GetParams()
 	EntityOverlapParams.FilterType = Enum.RaycastFilterType.Include;
 	EntityOverlapParams.CollisionGroup = 'Hitbox';
 	
-	if self.single then
-		EntityOverlapParams.MaxParts = 1;
-	end;
+	-- if self.single then
+	-- 	EntityOverlapParams.MaxParts = 1;
+	-- end;
 	
 	return EntityOverlapParams;
 end;

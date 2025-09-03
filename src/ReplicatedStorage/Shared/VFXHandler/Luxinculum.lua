@@ -19,9 +19,6 @@ VFX.start = function(Data)
     local targetRoot = target.Character.Root;
 
     local root = Data.Origin;
-
-    print("Luxinculum Start", target, targetRoot);
-
     local beam: BasePart = Assets.Luxinculum.Light:Clone();
     beam.Weld.Part0 = Data.Caster.Character.Root;
     beam.Parent = workspace.World.Debris;
@@ -39,18 +36,18 @@ VFX.start = function(Data)
                 return;
             end
     
-            elapsed = elapsed + dt / 0.6; -- math.clamp(elapsed + dt / dur, 0, 1);
+            elapsed = elapsed + dt / dur; -- math.clamp(elapsed + dt / dur, 0, 1);
             
             local look = (targetRoot.Position - root.Position).Unit;
             local dist = (targetRoot.Position - root.Position).Magnitude;
             
-            local endCF = root.Position:Lerp(targetRoot.Position, math.clamp(elapsed * 2, 0, 1));
+            local endCF = root.Position:Lerp(targetRoot.Position, math.clamp(elapsed, 0, 1));
             endCF = CFrame.new(endCF, endCF + look);
     
             for _,Beam: Beam in pairs(beam:GetChildren()) do
                 if Beam:IsA("Beam") then
-                    Beam.CurveSize0 = -dist * math.sin(math.pi*((1.5 - elapsed*1.5)^ 2)*2)/4;
-                    Beam.CurveSize1 = dist * math.sin(math.pi*((1.5 - elapsed*1.5)^ 2)*2)/3;
+                    Beam.CurveSize0 = -dist * math.sin(math.pi*((1 - elapsed*1)^ 2)*2)/4;
+                    Beam.CurveSize1 = dist * math.sin(math.pi*((1 - elapsed*1)^ 2)*2)/3;
                 end
             end
     
@@ -62,13 +59,13 @@ VFX.start = function(Data)
     task.delay(dur, function()
         for _,Beam: Beam in pairs(beam:GetChildren()) do
             if Beam:IsA("Beam") then
-                TweenService:Create(Beam, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
+                TweenService:Create(Beam, TweenInfo.new(dur, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
                     Width0 = 0; 
                     Width1 = 0;
                 }):Play();
             end
         end
-        task.delay(0.3, function()
+        task.delay(dur, function()
             task.cancel(tasks.Chain);
             tasks.Chain = nil;        
         end);
