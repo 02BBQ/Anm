@@ -198,7 +198,7 @@ VFX.start = function(Data)
     local BodyVelocity = Auxiliary.Shared.CreateVelocity(Root, {MaxForce = Vector3.new(1e6, 1e6, 1e6)});
     BodyVelocity.Velocity = Root.CFrame.LookVector*100;
 
-    Projectile:PivotTo(Root.CFrame * CFrame.new(0, 0, -2));
+    Projectile:PivotTo(Root.CFrame * CFrame.new(0, 0, -4));
     Projectile.Parent = workspace.World.Debris;
 
     local tasks = {};
@@ -225,23 +225,6 @@ VFX.start = function(Data)
         end;
     end)
 
-    for _, instance: Beam | Decal | BasePart in pairs(Projectile:GetDescendants()) do
-        if instance:IsA("Decal") or instance:IsA("BasePart") then
-            TweenService:Create(instance, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {
-                Transparency = 1
-            }):Play();
-        elseif instance:IsA("Beam") then
-            TweenService:Create(instance, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-                Width0 = 0, 
-                Width1 = 0
-            }):Play();
-        elseif instance:IsA("ParticleEmitter") then
-            instance.Enabled = false;
-        elseif instance:IsA("Trail") then
-            instance.Enabled = false;
-        end;
-    end;
-
     task.delay(0.625, function() --[[ Line: 532 ]]
         -- upvalues: v97 (ref), l_TweenService_0 (ref), v82 (ref)
         for _, instance: Beam | Decal | BasePart in pairs(Projectile:GetDescendants()) do
@@ -262,10 +245,10 @@ VFX.start = function(Data)
         end;
         game.Debris:AddItem(Projectile, 1);
         BodyVelocity:Destroy();
+        ShockConnection:Disconnect();
         task.delay(0.3, function()
             task.cancel(tasks.Spin);
             task.cancel(tasks.Tween);
-            ShockConnection:Disconnect();
             tasks.Spin = nil;
             tasks.Tween = nil;        
         end);
@@ -282,7 +265,7 @@ VFX.start = function(Data)
             Projectile.Trails.Trails.CFrame *= CFrame.Angles(0, 0, math.pi*dt*Speed);
 
             -- Projectile:PivotTo(Projectile:GetPivot() * CFrame.new(0, 0, -150*dt));
-            Projectile:PivotTo(Root.CFrame);
+            Projectile:PivotTo(Root.CFrame * CFrame.new(0, 0, -4));
             BodyVelocity.Velocity = Root.CFrame.LookVector*150;
         end
     end)

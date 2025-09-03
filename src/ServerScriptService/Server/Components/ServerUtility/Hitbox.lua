@@ -184,7 +184,7 @@ function Hitbox:Parse(HitboxPart: Part)
 	if self._DetectionBlacklist[FoundEntity] then return end;
 	if not FoundEntity.Combat.Detectable then return end;
 	if self.ignorePrevious and table.find(self.detected, FoundEntity) then return end;
-	if self.ignoreRagdolled and FoundEntity.Character.Ragdolled then return end;
+	-- if self.ignoreRagdolled and FoundEntity.Character.Ragdolled then return end;
 	if not FoundEntity.Character.Alive and self.ignoreDead then return end;
 	if #self.ignoredEntities ~= 0 then
 		if table.find(self.ignoredEntities, FoundEntity) then
