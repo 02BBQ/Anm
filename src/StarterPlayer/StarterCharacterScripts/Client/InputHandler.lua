@@ -15,12 +15,18 @@ function InputComponent:BindAction(keyCode, callback, ...)
 	self.actions[keyCode] = {callback = callback, args = {...}}
 end
 
+local mouseInputTypes = {
+	[Enum.UserInputType.MouseButton1] = true,
+	[Enum.UserInputType.MouseButton2] = true,
+	[Enum.UserInputType.MouseButton3] = true,
+}
+
 function InputComponent:HandleInput(Input: InputObject, isHeld)
 	local action
 	
 	if Input.UserInputType == Enum.UserInputType.Keyboard then
 		action = self.actions[Input.KeyCode]
-	elseif Input.UserInputType == Enum.UserInputType.MouseButton1 then
+	else --if mouseInputTypes[Input.UserInputType] then
 		action = self.actions[Input.UserInputType]	
 	end
 	
