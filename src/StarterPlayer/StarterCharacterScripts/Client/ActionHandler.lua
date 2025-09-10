@@ -95,7 +95,7 @@ function ActionComponent.Bind()
 	--return self;
 end
 
-function ActionComponent:LightAttack(held: boolean)
+function ActionComponent:LMB(held: boolean)
 	local Character = LocalPlayer.Character;
 	local Tool = Character:FindFirstChildOfClass("Tool");
 
@@ -115,8 +115,17 @@ end
 
 function ActionComponent:Dash(held: boolean)
 	local data = {held = held};
-	CharacterHandler:Dash();
-	_use:Fire({"Dash", data})
+	CharacterHandler:Dash(data);
+end
+
+function ActionComponent:WallCling(held: boolean)
+	local data = {held = held};
+	CharacterHandler.WallCling(data);
+end
+
+function ActionComponent:RMB(held: boolean)
+	local data = {held = held};
+	_use:Fire({"RMB", data})
 end
 
 local lastPressTime = 0

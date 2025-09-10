@@ -1,8 +1,15 @@
 local RunService = game:GetService('RunService');
+local ReplicatedStorage = game:GetService('ReplicatedStorage');
+local Shared = ReplicatedStorage.Shared;
 
 return {
 	Shared = require(script.Shared);
-	Maid = require(game:GetService("ReplicatedStorage").Shared.Utility.Maid);
-	BoatTween = require(game:GetService("ReplicatedStorage").Shared.Utility.BoatTween);
-	BridgeNet = require(game:GetService("ReplicatedStorage").Shared.Components.BridgeNet2);
+	Maid = require(Shared.Utility.Maid);
+	BoatTween = require(Shared.Utility.BoatTween);
+	BridgeNet = require(Shared.Components.BridgeNet2);
+	Wiki = require(Shared.Wiki);
+
+	Attribute = require(Shared.Utility.Attribute);
+	-- ClientStateManager = require(Shared.Utility.ClientStateManager);
+	StateManager = require(Shared.Utility.StateManager);
 };

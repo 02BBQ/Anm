@@ -88,12 +88,17 @@ local animNames = {
 			},
 	cheer = {
 				{ id = "http://www.roblox.com/asset/?id=129423030", weight = 10 } 
-			},
+	},
 }
 local dances = {"dance1", "dance2", "dance3"}
 
 -- Existance in this list signifies that it is an emote, the value indicates if it is a looping emote
 local emoteNames = { wave = false, point = false, dance1 = true, dance2 = true, dance3 = true, laugh = false, cheer = false}
+
+local walkTrack: AnimationTrack = Humanoid:WaitForChild("Animator"):LoadAnimation(script.run.RunAnim)
+walkTrack:GetMarkerReachedSignal("step"):connect(function(foot)
+	game.ReplicatedStorage.Remotes.ClientEffectsDirect:Fire("Footstep", {foot = foot})
+end)
 
 function configureAnimationSet(name, fileList)
 	if (animTable[name] ~= nil) then
@@ -257,7 +262,7 @@ function playAnimation(animName, transitionTime, humanoid)
 		currentAnimSpeed = 1.0
 	
 		-- load it to the humanoid; get AnimationTrack
-		currentAnimTrack = humanoid:LoadAnimation(anim)
+		currentAnimTrack = ((animName == "walk" or animName == "run") and walkTrack) or humanoid:LoadAnimation(anim)
 		currentAnimTrack.Priority = Enum.AnimationPriority.Core
 		 
 		-- play the animation
@@ -576,8 +581,6 @@ playAnimation("idle", 0.1, Humanoid)
 pose = "Standing"
 
 while Figure.Parent ~= nil do
-	local _, time = wait(0.1)
-	move(time)
+	task.wait(0.1)
+	move(tick())
 end
-
-

@@ -96,6 +96,7 @@ end
 
 function CombatManager:Active(bool: boolean)
 	self._Active = bool;
+	self.Parent.Character.Rig:SetAttribute("Active", bool);
 end
 
 function CombatManager:UpdateCombatStatus()

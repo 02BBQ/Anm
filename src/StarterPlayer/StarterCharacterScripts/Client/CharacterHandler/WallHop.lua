@@ -11,7 +11,7 @@ local userGameSettings = UserSettings():GetService("UserGameSettings")
 
 --// Variables
 local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAppearanceLoaded:Wait()
+local Character: Model  = LocalPlayer.Character or LocalPlayer.CharacterAppearanceLoaded:Wait()
 local HRP = Character:WaitForChild("HumanoidRootPart")
 local humanoid = Character.Humanoid
 
@@ -30,9 +30,9 @@ local totalHops = 0
 local hopTime = os.clock() 
 
 return function() 
-	return UserInputService.JumpRequest:Connect(function()
+	local hop = UserInputService.JumpRequest:Connect(function()
 		keyDown = true
-		task.delay(.3,function()
+		task.delay(0.2,function()
 			keyDown = false 
 		end)
 
@@ -66,6 +66,7 @@ return function()
 						end)
 					end
 
+					Auxiliary.Shared.ClearAllMovers(HRP);
 
 					local bv = Auxiliary.Shared.CreateVelocity(workspace)
 					bv.MaxForce = Vector3.new(90000,90000,90000)
@@ -74,7 +75,7 @@ return function()
 						local leftHopAnim = Animator:Fetch('Universal/WallHopLeft')
 						leftHopAnim:Play()
 
-						bv.Velocity = HRP.CFrame.RightVector*25+Vector3.new(0,35,0)
+						bv.Velocity = HRP.CFrame.RightVector*25+Vector3.new(0,50,0)
 
 						leftHopAnim.Stopped:Connect(function()
 
@@ -83,7 +84,7 @@ return function()
 						local rightHopAnim = Animator:Fetch('Universal/WallHopRight')
 						rightHopAnim:Play()
 
-						bv.Velocity = HRP.CFrame.RightVector*-25+Vector3.new(0,35,0)
+						bv.Velocity = HRP.CFrame.RightVector*-25+Vector3.new(0,50,0)
 
 						rightHopAnim.Stopped:Connect(function()
 
@@ -100,4 +101,11 @@ return function()
 			end
 		end
 	end)
+	local rem rem = Character.AncestryChanged:Connect(function(_, parent)
+		if not parent then
+			hop:Disconnect();
+			rem:Disconnect();
+		end
+	end)
+	return hop
 end

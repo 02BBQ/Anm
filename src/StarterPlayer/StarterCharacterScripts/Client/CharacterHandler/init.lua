@@ -13,8 +13,9 @@ local userGameSettings = UserSettings():GetService("UserGameSettings")
 local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary)
 local AnimatorModule = require(ReplicatedStorage.Shared.Utility.Animator)
 local Maid = require(ReplicatedStorage.Shared.Utility.Maid)
-local Run = require(script.Run);
--- local Network = require(ReplicatedStorage.Shared.Network)
+local Run = require(script.Run)
+local Dash = require(script.Dash)
+local WallCling = require(script.WallCling)
 
 local _use = Auxiliary.BridgeNet.ClientBridge('_use');
 local _knockback = Auxiliary.BridgeNet.ClientBridge('Knockback');
@@ -90,7 +91,7 @@ if RunService:IsClient() then
 	RunService.RenderStepped:Connect(UpdateRelativeCFrame)
 end
 
-_G.IsStunned = function()
+_G.CanUse = function()
 	if Character:GetAttribute('ClientActive') then
 		return false; 
 	end
@@ -139,172 +140,14 @@ function GetMoveDirection(Character: Model)
 	return Returning, MoveDirection;
 end;
 
-local function AirDash()
-	Character:SetAttribute('CantDash', true);
 
-	task.delay(0.5, function()
-		Character:SetAttribute('CantDash', false);
-	end)
+function CharacterHandler.Dash(Data)
+	Dash(Data, CharacterHandler)
+end
 
-	Character:SetAttribute('ClientActive', true);
-
-	task.delay(0.25, function()
-		Character:SetAttribute('ClientActive', false);
-	end)
-
-	Animator:Fetch('Universal/AirDash'):Play();
-	local BV = Auxiliary.Shared.CreateVelocity(HRP);
-	BV.Name = 'DashVelocity';
-	BV.MaxForce *= Vector3.new(1,1,1);
-	
-	local moveDirection = GetMoveDirection(Character);
-	local dir;
-	if moveDirection == 'Left' then
-		dir = -workspace.CurrentCamera.CFrame.RightVector;
-	elseif moveDirection == 'Right' then
-		dir = workspace.CurrentCamera.CFrame.RightVector;
-	elseif moveDirection == 'Forward' then
-		dir = workspace.CurrentCamera.CFrame.LookVector;
-	elseif moveDirection == 'Backward' then
-		dir = -workspace.CurrentCamera.CFrame.LookVector;
-	else
-		dir = workspace.CurrentCamera.CFrame.LookVector;
-	end
-	
-	BV.Velocity = dir * 85;
-	game.Debris:AddItem(BV, 0.15);
-end;
-
-function CharacterHandler.Dash()
-	local Character = LocalPlayer.Character;
-	if not Character or not Character:IsDescendantOf(Auxiliary.Shared.Alive) then return end;
-	if not _G.IsStunned() then return end;
-	if Character:GetAttribute('CantDash') then return end;
-
-	if CharacterHandler.AirStepped then
-		AirDash();
-		return;
-	end;
-
-	Character:SetAttribute('CantDash', true);
-
-	task.delay(2, function()
-		Character:SetAttribute('CantDash', false);
-	end)
-
-	_use:Fire({"Action", "Dash", {MoveDirection = GetMoveDirection(Character)}});
-
-	local MoveDirection = GetMoveDirection(Character);
-	local IsSide = MoveDirection == 'Left' or MoveDirection == 'Right';
-
-	local HRP = Character:WaitForChild('HumanoidRootPart');
-	local humanoid: Humanoid = Character:FindFirstChildOfClass('Humanoid');
-
-	if HRP:FindFirstChild('DashVelocity') then
-		HRP.DashVelocity:Destroy();
-	end;
-
-	local Resp;
-	task.spawn(function()
-		--Resp = Network:Send('Action', {
-		--	Action='Dash';
-		--	Data = {
-		--		MoveDirection = MoveDirection;
-		--	};
-		--}, true);
-	end);
-
-	local Anim;
-	if MoveDirection ~= 'No' then
-		Anim = Animator:Fetch('Universal/'..MoveDirection);
-		if Anim then
-			Anim:Play();
-			Anim.Stopped:Connect(function()
-				if HRP:FindFirstChildOfClass('BodyPosition') then
-					HRP:FindFirstChildOfClass('BodyPosition'):Destroy();
-				end
-				if HRP:FindFirstChildOfClass('BodyVelocity') then
-					HRP:FindFirstChildOfClass('BodyVelocity'):Destroy();
-				end
-			end)
-		end
-	end;
-
-	local DashTick = tick();
-	local function CheckDashing()
-		if not Resp and tick()-DashTick < 2 then
-			return true;
-		end;
-		return Character:GetAttribute('Dashing');
-	end;
-
-	local BV = Auxiliary.Shared.CreateVelocity(HRP);
-	BV.Name = 'DashVelocity';
-	local yMaxForce = 0; --humanoid:GetState() == Enum.HumanoidStateType.Freefall and 0.5 or 0;
-	BV.MaxForce *= Vector3.new(1,yMaxForce,1);
-
-	humanoid.AutoRotate = true;
-	-- add later
-	Character:SetAttribute('ClientActive', true);
-
-	local Dash = function()
-		Character:SetAttribute('SideDashingClient', true);
-
-		task.delay(0.5, function()
-			Character:SetAttribute('ClientActive', false);
-		end);
-
-		local DashDuration = 0.4;
-
-		local VelocityValue = Instance.new('NumberValue');
-		VelocityValue.Value = 0;
-
-		task.spawn(function()
-			TweenService:Create(VelocityValue, TweenInfo.new(DashDuration*.05, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Value = 115}):Play();
-
-			task.wait(DashDuration*.05);
-
-			TweenService:Create(VelocityValue, TweenInfo.new(DashDuration*1, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Value = 0}):Play();
-		end);
-
-		Character:SetAttribute('cameraFacing', true);
-
-		local Connec = RunService.Stepped:Connect(function()
-			local Vel = ((MoveDirection == 'Left' or MoveDirection == 'Backward') and -VelocityValue.Value) or VelocityValue.Value;
-			local RelativeCFr = CharacterHandler.RelativeCFrame;
-
-			if IsSide then
-				BV.Velocity = RelativeCFr.RightVector * Vel;
-			else
-				BV.Velocity = RelativeCFr.LookVector * Vel;
-			end
-		end);
-
-		local function Finish()
-			Character:SetAttribute('cameraFacing', false);
-			VelocityValue:Destroy();
-			Connec:Disconnect();
-			BV:Destroy();
-			Character:SetAttribute('SideDashingClient', nil);
-		end
-
-		local Cancel = false
-
-		task.delay(DashDuration * 0.6, function()
-			if Cancel then return end
-
-			Finish()
-		end);
-	end;
-
-	Dash();
-	humanoid.AutoRotate = true;
-	--CharacterHandler.SetMovementDisabled(false);
-
-	if not IsSide then
-		Character:SetAttribute('ClientActive', false);
-	end;
-end;
+function CharacterHandler.WallCling(Data)
+	WallCling(not Data.held)
+end
 
 function CharacterHandler.HandleTool(Held, Tool)
 	local Character = LocalPlayer.Character;

@@ -23,13 +23,15 @@ humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
 humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
 
 local initialize = function()
-	InputHandler:BindAction(Enum.UserInputType.MouseButton1, ActionHandler.LightAttack);
+	InputHandler:BindAction(Enum.UserInputType.MouseButton1, ActionHandler.LMB);
+	InputHandler:BindAction(Enum.UserInputType.MouseButton2, ActionHandler.RMB);
 	InputHandler:BindAction(Enum.KeyCode.R, ActionHandler.Critical);
 	InputHandler:BindAction(Enum.KeyCode.F, ActionHandler.Block);
 	InputHandler:BindAction(Enum.KeyCode.Q, ActionHandler.Dash);
 	InputHandler:BindAction(Enum.KeyCode.W, ActionHandler.Sprint);
 	InputHandler:BindAction(Enum.KeyCode.V, ActionHandler.Carry);
 	InputHandler:BindAction(Enum.KeyCode.B, ActionHandler.Grip);
+	InputHandler:BindAction(Enum.KeyCode.Space, ActionHandler.WallCling);
 	
 	--ActionHandler:Bind();
 

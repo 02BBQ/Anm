@@ -120,6 +120,16 @@ Auxiliary.CreatePosition = function(Parent: BasePart, Data: table)
 	return BodyPosition;
 end;
 
+Auxiliary.ClearAllMovers = function(Part: BasePart)
+	for _, Velocity in Part:GetChildren() do
+		if Velocity and (Velocity:IsA('BodyVelocity') or Velocity:IsA('LinearVelocity') or Velocity:IsA('BodyPosition')) then
+			Velocity:Destroy()
+		end
+	end
+
+end
+
+
 Auxiliary.RemoveFirstValue = function(tab )
 	for i in tab do
 		table.remove(tab,i);

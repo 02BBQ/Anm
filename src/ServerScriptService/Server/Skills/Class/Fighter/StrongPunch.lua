@@ -21,11 +21,11 @@ function Spell:OnCast(Entity, Args)
 	hitbox.instance = Entity.Character.Root;
 	hitbox.size = Vector3.new(12,12,15);
 	hitbox.offset = CFrame.new(0,0,-7);
-	hitbox.debug = false;
+	hitbox.debug = true;
 	hitbox.onHit = function(EnemyEntity)
 		EnemyEntity.Combat:TakeDamage({
 			Ragdoll = {Duration = 2};
-			Knockback = {Velocity = Vector3.new(0,50,0)};
+			Knockback = {Velocity = Entity.Character.Root.CFrame.LookVector * 45 + Vector3.new(0,50,0)};
 			Damage = 12;
 			BlockBreak = true;
 		}, Entity);

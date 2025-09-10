@@ -41,7 +41,7 @@ return function()
 	local function onRender(dt)
 		local cache = {};
 		
-		local WalkSpeed = (Character:GetAttribute("Running") and _G.IsStunned() and not _G.EffectReplicator:FindEffect("SlowedMovement")) and 36 or 15
+		local WalkSpeed = (Character:GetAttribute("Running") and _G.CanUse() and not _G.EffectReplicator:FindEffect("SlowedMovement")) and 36 or 15
 		local JumpPower = 50 - 10 * (1 - humanoid.Health / humanoid.MaxHealth);
 		
 		for i, Effect in _G.EffectReplicator:GetEffects() do

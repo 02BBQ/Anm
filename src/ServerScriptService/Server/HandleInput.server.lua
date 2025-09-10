@@ -94,6 +94,10 @@ _use:Connect(function(player, args)
         Skills['Carry']({Caster = Entity, Args = data});
     elseif action == "Grip" then
         Skills['Grip']({Caster = Entity, Args = data});
+    elseif action == "Dash" then
+        Skills['Dash']({Caster = Entity, Args = data});
+    elseif action == "RMB" then
+        Skills['Uppercut']({Caster = Entity, Args = data});
     end
 end);
 
