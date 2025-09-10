@@ -68,7 +68,9 @@ local FetchTypes = {
 
 	GetMouse = function(IgnoreCanCollide)
 		if IgnoreCanCollide then
-			local ray = workspace.CurrentCamera:ScreenPointToRay(Mouse.X, Mouse.Y)
+			local mousePos = UserInputService:GetMouseLocation();
+			local ray = workspace.CurrentCamera:ViewportPointToRay(mousePos.X, mousePos.Y);
+			-- local ray = workspace.CurrentCamera:ScreenPointToRay(Mouse.X, Mouse.Y)
 			local OriginPos = workspace.CurrentCamera.CFrame.Position
 			
 			local RayLength = 1000

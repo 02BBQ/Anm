@@ -16,7 +16,8 @@ local Maid = require(ReplicatedStorage.Shared.Utility.Maid)
 local Run = require(script.Run);
 -- local Network = require(ReplicatedStorage.Shared.Network)
 
-local _use = require(ReplicatedStorage.Shared.Components.BridgeNet2).ClientBridge('_use'); --Auxiliary.bridgeNet2.ClinetBridge('_use')
+local _use = Auxiliary.BridgeNet.ClientBridge('_use');
+local _knockback = Auxiliary.BridgeNet.ClientBridge('Knockback');
 
 --// Variables
 local ClientMaid = Maid.new();
@@ -349,6 +350,49 @@ end
 
 CharacterHandler.Initialize = function()
 	local Character = LocalPlayer.Character;
+	
+	ClientMaid:AddTask(_knockback:Connect(function(Args)
+		local Data = Args.Data;
+		local Entity = Args.Entity;
+		
+		local Root = Entity.Character.Root;
+		
+		local Velocity = Data["Velocity"]
+		local Push = Data["Push"]
+		local AngularVelocity = Data["AngularVelocity"]
+		local MaxForce = Data["MaxForce"]
+		local Duration = Data["Duration"]
+		local Ease = Data["Ease"]
+		local Stay = Data["Stay"]
+
+		local TrueVelocity = Velocity or ((Root.CFrame).LookVector * Push)
+
+		if AngularVelocity then
+			Character.HumanoidRootPart.AssemblyAngularVelocity = Character.HumanoidRootPart.AssemblyAngularVelocity + AngularVelocity
+		end
+
+		local BV = Auxiliary.Shared.CreateVelocity(Character.HumanoidRootPart)		
+		BV.Velocity = TrueVelocity
+
+		if MaxForce then
+			BV.MaxForce = MaxForce
+		end
+
+		if Ease then
+			TweenService:Create(BV, TweenInfo.new(Duration, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Velocity = Vector3.zero}):Play()
+		end
+
+		task.delay(Duration, function()
+			if Stay then
+				task.delay(Stay, function()
+					BV:Destroy()
+				end)
+			else
+				BV:Destroy()
+			end
+		end)
+	end))
+	
 	ClientMaid:AddTask(RunService.PreRender:Connect(function(dt)
 		if Character.Parent == nil then return end;
 		isRunning = false;

@@ -11,21 +11,27 @@ Spell.CastSign = 2;
 
 function Spell:OnCast(Entity, Args)
     if not Args["held"] then return end;
-    local Character = Entity.Character;
+	local Character = Entity.Character;
+	
+	local Start = Entity.Animator:Fetch("Spell/Luxin");
+	Start:Play();
+	
+	Auxiliary.Shared.WaitForMarker(Start,"cast")
 
 	local hitbox = Entity:CreateHitbox()
 	hitbox.instance = Entity.Character.Root;
-	hitbox.size = Vector3.new(10,10,50);
+	hitbox.size = Vector3.new(30,30,70);
 	hitbox.offset = CFrame.new(0,0,-25);
 	hitbox.debug = true;
     hitbox.single = true;
 	hitbox.onHit = function(EnemyEntity)
         Entity.VFX:Fire("Luxinculum", {Action = "start", Target = EnemyEntity:GetClientEntity()});
-        task.delay(0.3, function()
-            local bp = Auxiliary.Shared.CreatePosition(EnemyEntity.Character.Root);
-            bp.Position = (Entity.Character.Root.CFrame * CFrame.new(0,0,-3)).p;
-            EnemyEntity.Combat:TakeDamage({Damage = 25}, Entity);
-        end)
+		Auxiliary.Shared.WaitForMarker(Start,"pull")
+        local bp = Auxiliary.Shared.CreatePosition(EnemyEntity.Character.Root);
+        bp.P = 80000;
+        bp.Position = (Entity.Character.Root.CFrame * CFrame.new(0,0,-3)).p;
+        game.Debris:AddItem(bp, 0.3);
+        EnemyEntity.Combat:TakeDamage({Damage = 10}, Entity);
 	end
 
 	hitbox:Fire();

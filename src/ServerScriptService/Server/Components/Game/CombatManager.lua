@@ -19,6 +19,8 @@ local SoundHandler = require(Shared.Utility.SoundHandler);
 local IsStudio = RunService:IsStudio();
 local random = Random.new();
 
+local Knockback = BridgeNet.ServerBridge('Knockback');
+
 --//Module
 local CombatManager = {};
 CombatManager.__index = CombatManager;
@@ -188,7 +190,7 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 	local function OnHit()
 
 		if self:IsParrying() and not DamageData.NotParryable then
-			entity.Cooldowns:Stop('Parry', 1);
+			entity.Cooldowns:Reset('Parry', 1);
 			attackerEntity.Combat:AttemptCancel(DamageData.Cancel or 1);
 			attackerEntity.EffectReplicator:CreateEffect("Stunned"):Debris();
 			entity.VFX:Fire("HitEffect",
@@ -222,9 +224,10 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 		end
 
 		if DamageData.Knockback then
-			attackerEntity.Combat:Knockback(entity, DamageData.Knockback)
+			DamageData.attacker = attackerEntity;
+			self:Knockback(DamageData.Knockback)
 			if DamageData.Knockback.Follow then
-				attackerEntity.Combat:Knockback(attackerEntity, DamageData.Knockback)
+				attackerEntity.Combat:Knockback(DamageData.Knockback)
 			end
 		end
 
@@ -264,24 +267,68 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 				entity.Character.Humanoid.Health -= Damage;
 			end
 
-			if VFX then
-				entity.VFX:Fire("HitEffect",
+			entity.VFX:Fire("HitEffect",
 					{
 						Victim = rig;
-						Origin = rig.HumanoidRootPart;
-						Root = attacker.HumanoidRootPart;
+						Attacker = attackerEntity:GetClientEntity();
 						Type = VFX;
 						Damage = Damage;
 						Sound = DamageData.Sound;
-						HitShake = true;
-					}, BridgeNet.AllPlayers())
-			end
+					})
 
 			entity.Animator:Fetch('Universal/Hurt'..random:NextInteger(1,3)):Play()
 		end
 	end;
 
 	OnHit();
+end
+
+function CombatManager:Knockback(Data)
+	local TargetEntity = self.Parent;
+	if TargetEntity.Player and TargetEntity.Character.Root:GetNetworkOwner() == TargetEntity.Player then
+		Knockback:Fire(TargetEntity.Player, {Entity = TargetEntity:GetClientEntity(); Data = Data});
+		--[[
+			Data.attacker,
+			Data.Velocity,
+			Data.Push,
+			Data.AngularVelocity,
+			Data.MaxForce,
+			Data.Duration,
+			Data.Ease,
+			Data.Stay
+		]]
+	else
+		local TrueVelocity = Data.Velocity or ((Data.attacker or self.Parent.Character.Root.CFrame).LookVector * Data.Push);
+		--TargetEntity.Character:AssignOwnership(self.Parent.Player);
+
+		if Data.AngularVelocity then
+			TargetEntity.Character.Root.AssemblyAngularVelocity += Data.AngularVelocity;
+		end;
+
+		local BV: BodyVelocity = Auxiliary.Shared.CreateVelocity(TargetEntity.Character.Root);		
+		BV.Velocity = TrueVelocity;
+
+		if Data.MaxForce then
+			BV.MaxForce = Data.MaxForce;
+		end;
+
+		if Data.Ease then
+			TweenService:Create(BV, TweenInfo.new(Data.Duration, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Velocity = Vector3.zero}):Play();
+		end;
+
+		task.delay(Data.Duration, function()
+			if Data.Stay then
+				task.delay(Data.Stay, function()
+					BV:Destroy();
+					--TargetEntity.Character:AssignOwnership(false);
+				end)
+			else
+				BV:Destroy();
+				--TargetEntity.Character:AssignOwnership(false);
+			end
+
+		end);
+	end
 end
 
 function CombatManager:BlockBreak()

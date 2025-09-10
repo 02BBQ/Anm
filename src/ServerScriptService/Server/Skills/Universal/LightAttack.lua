@@ -68,7 +68,7 @@ return function(Params)
 	hitbox.onHit = function(EnemyEntity)
 		local DamageData = {
 			Damage = WeaponInfo.Damage;
-			Sound = "HitSounds"
+			Sound = "Hit/Punch"..math.random(1,3);
 		}
 		EnemyEntity.Combat:TakeDamage(DamageData, Entity);
 	end
