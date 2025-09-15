@@ -10,11 +10,15 @@ Spell.Name = script.Name;
 Spell.CastSign = 0;
 
 function Spell:OnCast(Entity, Args)
-    if not Args["held"] then return end;
+	if not Args["held"] then return end;
+	if not Entity.Combat:CanUse() then return end;
 
-	local Start = Entity.Animator:Fetch("Fighter/RapidPunches");
-    Start:Play();
-    Start:AdjustSpeed(1.2);
+	local Start : AnimationTrack = Entity.Animator:Fetch("Fallen/Shatter");
+	Start:Play();
+	
+	Start:AdjustSpeed(1.25);
+	
+	Entity.VFX:Fire("Fallen/Shatter", {Action = "start", ID = Start.Animation.AnimationId});
 end;
 
 

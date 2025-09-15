@@ -8,7 +8,7 @@ local Players = game:GetService('Players');
 local Server: Folder = ServerScriptService:WaitForChild('Server');
 local Components: Folder = Server.Components;
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local Auxiliary = require(Shared.Utility.Auxiliary);
 local EntityManager = require(Components.Core.EntityManager);

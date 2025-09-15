@@ -8,7 +8,7 @@ local RunService = game:GetService('RunService');
 local TweenService = game:GetService('TweenService');
 
 local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary);
-local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
+local Signal = require(ReplicatedStorage.Shared.Package.Signal);
 local Wiki = require(ReplicatedStorage.Shared.Wiki);
 local ItemFactory = require(ServerScriptService.Server.Components.Misc.ItemFactory);
 

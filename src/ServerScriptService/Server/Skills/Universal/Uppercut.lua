@@ -3,7 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 local Server = ServerScriptService.Server;
 
 local Wiki = require(Shared.Wiki);
@@ -20,8 +20,10 @@ return function(Params)
 	local Character = Entity.Character;
 
 	if Entity.Cooldowns.OnCooldown["Uppercut"] then return end;
-	if not Entity.Combat:CanUse() then return end;
+	if not Character.Rig:GetAttribute("Dashing") then return end;
+	--if not Entity.Combat._Active then return end;
 	if Args.held then return end;
+	Entity.Cooldowns:Add("Uppercut", 3);
 
 	Entity.Combat:Active(false);
 	
@@ -40,6 +42,7 @@ return function(Params)
 			Damage = 10;
 			Sound = "Hit/Punch"..math.random(1,3);
 			Knockback = {Velocity = Entity.Character.Root.CFrame.LookVector * 20 + Vector3.new(0,75 ,0), Duration = 0.25};
+			Ragdoll = {Duration = 2};
 		}
 		EnemyEntity.Combat:TakeDamage(DamageData, Entity);
 	end
@@ -48,5 +51,4 @@ return function(Params)
 
 	Entity.Combat:Active(true);
 
-	Entity.Cooldowns:Add("Uppercut", 3);
 end

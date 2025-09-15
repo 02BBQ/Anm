@@ -12,7 +12,8 @@ local userGameSettings = UserSettings():GetService("UserGameSettings")
 --// Requires
 local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary)
 local AnimatorModule = require(ReplicatedStorage.Shared.Utility.Animator)
-local Maid = require(ReplicatedStorage.Shared.Utility.Maid)
+local Maid = require(ReplicatedStorage.Shared.Package.Maid)
+local ClientHitbox = require(ReplicatedStorage.Shared.Services.Hitbox)
 local Run = require(script.Run)
 local Dash = require(script.Dash)
 local WallCling = require(script.WallCling)
@@ -33,7 +34,7 @@ local Animator = AnimatorModule.new(LocalPlayer);
 Animator:Cache();
 _G.Animator = Animator;
 
-_G.EffectReplicator = require(ReplicatedStorage.Shared.Components.EffectReplicator)
+_G.EffectReplicator = require(ReplicatedStorage.Shared.Services.EffectReplicator)
 
 CharacterHandler.Slide = require(script.Slide);
 CharacterHandler.AirStepped = false;
@@ -193,6 +194,10 @@ end
 
 CharacterHandler.Initialize = function()
 	local Character = LocalPlayer.Character;
+	
+	ReplicatedStorage.Shared.Remotes.Hitbox.OnClientInvoke = function(params)
+		return ClientHitbox.HandleServerRequest(params)
+	end
 	
 	ClientMaid:AddTask(_knockback:Connect(function(Args)
 		local Data = Args.Data;

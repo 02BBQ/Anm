@@ -10,8 +10,8 @@ local Shared = ReplicatedStorage.Shared;
 local Map: Folder = workspace:WaitForChild("World"):WaitForChild('Map');
 
 --// Modules
-local bridgeNet = require(Shared.Components.BridgeNet2);
-local Network = require(Shared.Components.Networking.Network);
+local bridgeNet = require(Shared.Package.BridgeNet2);
+local Network = require(Shared.Services.Networking.Network);
 local CharacterHandler = require(script.Parent.CharacterHandler);
 local Auxiliary = require(Shared.Utility.Auxiliary);
 

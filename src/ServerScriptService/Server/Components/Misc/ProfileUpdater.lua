@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local Network = require(ReplicatedStorage.Shared.Components.Networking.Network);
+local Network = require(ReplicatedStorage.Shared.Services.Networking.Network);
 local ProfileHandler = require(ServerScriptService.Server.Components.Data.ProfileHandler)
 
 local UpdateInterval = 99999

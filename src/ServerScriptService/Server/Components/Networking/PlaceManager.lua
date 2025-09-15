@@ -8,12 +8,12 @@ local ServerScriptService = game:GetService('ServerScriptService');
 local Server: Folder = ServerScriptService:WaitForChild('Server');
 local Components: Folder = Server.Components;
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local Network = require(SharedComponents.Networking.Network);
 local PlaceService = require(SharedComponents.Networking.PlaceService);
 local EntityManager = require(Components.Core.EntityManager);
-local Signal = require(SharedComponents.Utility.Signal);
+local Signal = require(SharedComponents.Package.Signal);
 
 type ServerOptions = {
 	AccessCode: string?;

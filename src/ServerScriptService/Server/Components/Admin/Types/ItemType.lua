@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService('ServerScriptService');
 local Players = game:GetService('Players');
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local Auxiliary = require(Shared.Utility.Auxiliary);
 local ItemInfo = require(Shared.Wiki).ItemInfo;

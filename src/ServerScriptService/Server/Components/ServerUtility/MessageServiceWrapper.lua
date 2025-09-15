@@ -6,7 +6,7 @@ local ServerScriptService = game:GetService('ServerScriptService');
 local MessagingService = game:GetService('MessagingService');
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 --//Module
 local Wrapper = {};

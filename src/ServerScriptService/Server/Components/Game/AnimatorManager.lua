@@ -4,7 +4,7 @@ local RunService = game:GetService('RunService');
 local TweenService = game:GetService('TweenService');
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 local AnimationsFolder: Folder = Shared.Assets.Animations;
 
 local Auxiliary = require(Shared.Utility.Auxiliary);

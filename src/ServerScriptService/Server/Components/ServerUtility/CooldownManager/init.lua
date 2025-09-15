@@ -6,9 +6,9 @@ local RunService = game:GetService('RunService');
 local Server: Folder = ServerScriptService:WaitForChild('Server');
 local Components: Folder = Server.Components;
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
-local Bridge = require(SharedComponents.BridgeNet2);
+local Bridge = require(Shared.Package.BridgeNet2);
 local SharedCooldowns = require(script.SharedCooldowns);
 
 local function FindShared(SkillName: string)

@@ -9,9 +9,9 @@ local TweenService = game:GetService('TweenService');
 local Server: Folder = ServerScriptService:WaitForChild('Server');
 local Components: Folder = Server.Components;
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
-local BridgeNet = require(SharedComponents.BridgeNet2);
+local BridgeNet = require(Shared.Package.BridgeNet2);
 local Auxiliary = require(Shared.Utility.Auxiliary);
 local TroveClass = require(Shared.Utility.Trove);
 local SoundHandler = require(Shared.Utility.SoundHandler);

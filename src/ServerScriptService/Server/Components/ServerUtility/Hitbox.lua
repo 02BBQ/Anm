@@ -6,7 +6,7 @@ local RunService = game:GetService('RunService');
 local Server: Folder = ServerScriptService:WaitForChild('Server');
 local Components: Folder = Server.Components;
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local World   : Folder = workspace:WaitForChild("World")
 local Entities: Folder = World:WaitForChild('Alive');
@@ -61,7 +61,7 @@ end;
 function Hitbox:GetParams()
 	local Detecting = {};
 	
-	Detecting = {workspace.World.Alive}
+	Detecting = self.detecting or {workspace.World.Alive}
 	
 	local EntityOverlapParams = OverlapParams.new();
 	EntityOverlapParams.FilterDescendantsInstances = Detecting;

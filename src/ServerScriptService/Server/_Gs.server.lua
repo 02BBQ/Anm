@@ -5,4 +5,4 @@ local Shared = ReplicatedStorage.Shared;
 local Server = ServerScriptService.Server;
 local ServerComponents = Server.Components;
 
-_G.BridgeNet2 = require(Shared.Components.BridgeNet2)
+_G.BridgeNet2 = require(Shared.Package.BridgeNet2)

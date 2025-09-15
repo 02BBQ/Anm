@@ -10,13 +10,13 @@ local TweenService = game:GetService('TweenService');
 local Auxiliary = require(ReplicatedStorage.Shared.Utility.Auxiliary);
 local Attirbute = require(ReplicatedStorage.Shared.Utility.Attribute);
 local Ragdoll = require(script.Ragdoll);
-local Signal = require(ReplicatedStorage.Shared.Utility.Signal);
-local Race = require(ReplicatedStorage.Shared.Components.Race);
+local Signal = require(ReplicatedStorage.Shared.Package.Signal);
+local Race = require(ReplicatedStorage.Shared.Services.Race);
 local ItemFactory = require(ServerScriptService.Server.Components.Misc.ItemFactory);
 local InitializeManager = require(script.Initialize);
 local WeaponManager = require(ServerScriptService.Server.Components.Game.WeaponManager);
 local Trove = require(ReplicatedStorage.Shared.Utility.Trove)
-local Network = require(ReplicatedStorage.Shared.Components.Networking.Network);
+local Network = require(ReplicatedStorage.Shared.Services.Networking.Network);
 
 local CharacterManager = {}
 

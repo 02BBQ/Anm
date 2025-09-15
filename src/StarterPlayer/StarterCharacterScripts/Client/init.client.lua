@@ -6,7 +6,7 @@ local Shared = ReplicatedStorage.Shared;
 local InputHandlerModule = require(script.InputHandler);
 local CharacterHandler = require(script.CharacterHandler);
 local ActionHandler = require(script.ActionHandler);
-local Maid = require(Shared.Utility.Maid);
+local Maid = require(Shared.Package.Maid);
 
 local InputHandler = InputHandlerModule.new();
 

@@ -6,7 +6,7 @@ local HttpService = game:GetService('HttpService');
 local ServerStorage = game:GetService('ServerStorage')
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 local Server = ServerScriptService.Server;
 local Storage = ServerStorage.Storage;
 

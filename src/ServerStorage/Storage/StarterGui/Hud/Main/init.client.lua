@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage");
 local Tween = game:GetService("TweenService");
-local Maid = require(ReplicatedStorage.Shared.Utility.Maid);
+local Maid = require(ReplicatedStorage.Shared.Package.Maid);
 
 
 

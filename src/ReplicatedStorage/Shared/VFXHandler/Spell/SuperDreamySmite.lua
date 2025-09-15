@@ -8,7 +8,7 @@ local Auxiliary = require(Shared.Utility.Auxiliary);
 local Sound = require(Shared.Utility.SoundHandler);
 
 --// Modules
-local FastCast = require(Shared.Utility.FastCast);
+local FastCast = require(Shared.Package.FastCast);
 
 local caster = FastCast.new()
 local castBehavior = FastCast.newBehavior()

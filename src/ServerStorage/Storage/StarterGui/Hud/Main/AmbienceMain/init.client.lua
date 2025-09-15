@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService")
 
 local LABEL_DURATION = 3
 local FADE_INFO = TweenInfo.new(1)
-local Zone = require(ReplicatedStorage.Shared.Utility.Zone)
+local Zone = require(ReplicatedStorage.Shared.Package.Zone)
 local LocationClient = require(script.LocationClient)
 local localPlayer = game.Players.LocalPlayer
 local playerGui = localPlayer:WaitForChild("PlayerGui")

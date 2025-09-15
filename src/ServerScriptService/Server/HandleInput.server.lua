@@ -36,7 +36,7 @@ local ServerComponents = Server.Components;
 
 --// Modules
 local EntityManager = require(ServerComponents.Core.EntityManager);
-local bridgeNet2 = require(ReplicatedStorage.Shared.Components.BridgeNet2)
+local bridgeNet2 = require(ReplicatedStorage.Shared.Package.BridgeNet2)
 local Skills = require(Server.Skills);
 
 --// Variables

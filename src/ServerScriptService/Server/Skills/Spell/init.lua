@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage");
 local ServerScriptService = game:GetService("ServerScriptService");
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 local Auxiliary = require(Shared.Utility.Auxiliary);
 local Wiki = require(Shared.Wiki);
 local Object = require(SharedComponents.NexusObject);

@@ -7,7 +7,7 @@ local ServerStorage = game:GetService('ServerStorage')
 local Debris = game:GetService('Debris');
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 local Server = ServerScriptService.Server;
 local Storage = ServerStorage.Storage;
 

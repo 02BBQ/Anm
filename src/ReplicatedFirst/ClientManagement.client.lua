@@ -11,7 +11,7 @@ ContentProvider:PreloadAsync(assets)
 print("All assets loaded.")
 
 
-local BridgeNet2 = require(ReplicatedStorage.Shared.Components.BridgeNet2);
+local BridgeNet2 = require(ReplicatedStorage.Shared.Package.BridgeNet2);
 local EffectHandler = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("VFXHandler"));
 local Sound = require(ReplicatedStorage.Shared.Utility.SoundHandler);
 Sound:Cache();

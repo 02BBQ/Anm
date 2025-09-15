@@ -6,7 +6,7 @@ local Players = game:GetService('Players');
 local Server: Folder = ServerScriptService:WaitForChild('Server');
 local Components: Folder = Server.Components;
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local Network = require(SharedComponents.Networking.Network);
 local Information = require(SharedComponents.Data.Information);

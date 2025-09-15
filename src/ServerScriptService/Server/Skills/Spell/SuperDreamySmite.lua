@@ -2,13 +2,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage");
 local ServerScriptService = game:GetService("ServerScriptService");
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 local Auxiliary = require(Shared.Utility.Auxiliary);
 
 local Spell = require(script.Parent):Extend();
 Spell.Name = script.Name;
 
-local FastCast = require(Shared.Utility.FastCast);
+local FastCast = require(Shared.Package.FastCast);
 
 local Caster = FastCast.new()
 local CastBehavior = FastCast.newBehavior()

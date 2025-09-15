@@ -4,7 +4,7 @@ local SoundService = game:GetService('SoundService');
 local Debris =game:GetService('Debris');
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local SoundFolder: Folder = Shared.Assets.Sounds;
 local Effects: Folder = workspace:WaitForChild('World'):WaitForChild('Debris');

@@ -27,7 +27,7 @@ local task_wait = task.wait;
 workspace:SetAttribute("RbxLegacyAnimationBlending", true)
 
 local ServerReplicator = {};
-local EffectReplicator, Replication = require(ReplicatedStorage.Shared.Components.EffectReplicator), ReplicatedStorage.Remotes.EffectReplication
+local EffectReplicator, Replication = require(ReplicatedStorage.Shared.Services.EffectReplicator), ReplicatedStorage.Remotes.EffectReplication
 local PlayerEffects = {}
 local UpdateRemote = Replication._update
 local PlayerContainers = {}
@@ -37,7 +37,7 @@ local Components = ServerScriptService.Server.Components;
 
 local EntityManager = require(Components.Core.EntityManager)
 local Cmdr = require(Components.Admin.Cmdr);
-local Network = require(ReplicatedStorage.Shared.Components.Networking.Network);
+local Network = require(ReplicatedStorage.Shared.Services.Networking.Network);
 
 Network:OpenDefaultChannels();
 

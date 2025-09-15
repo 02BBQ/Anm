@@ -6,9 +6,9 @@ local Players = game:GetService('Players');
 local Server: Folder = ServerScriptService:WaitForChild('Server');
 local Components: Folder = Server.Components;
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
-local Network = require(SharedComponents.BridgeNet2);
+local Network = require(Shared.Package.BridgeNet2);
 local Auxiliary = require(Shared.Utility.Auxiliary);
 
 local _effect = Network.ServerBridge('_effect');

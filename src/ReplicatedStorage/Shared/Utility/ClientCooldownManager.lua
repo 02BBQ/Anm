@@ -2,10 +2,10 @@
 local ReplicatedStorage = game:GetService('ReplicatedStorage');
 
 local Shared : Folder = ReplicatedStorage.Shared;
-local SharedComponents : Folder = Shared.Components;
+local SharedComponents : Folder = Shared.Services;
 
 local Network = require(SharedComponents.Networking.Network);
-local Signal = require(SharedComponents.Utility.Signal);
+local Signal = require(SharedComponents.Package.Signal);
 
 --//Module
 local CooldownManager = {};

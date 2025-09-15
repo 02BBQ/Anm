@@ -10,7 +10,7 @@ local TweenService = game:GetService('TweenService');
 local module = {}
 
 local Setups = {
-    Race = require(ReplicatedStorage.Shared.Components.Race);
+    Race = require(ReplicatedStorage.Shared.Services.Race);
 };
 
 -- 모든 Setup 모듈들을 자동으로 로드

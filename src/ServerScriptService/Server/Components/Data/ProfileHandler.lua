@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService('ReplicatedStorage');
 local serverScriptService = game:GetService('ServerScriptService');
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local ProfileService = require(script.Parent.ProfileService);
 local Auxiliary = require(Shared.Utility.Auxiliary);

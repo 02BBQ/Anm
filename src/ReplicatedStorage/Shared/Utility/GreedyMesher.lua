@@ -2,7 +2,7 @@
 local ReplicatedStorage = game:GetService('ReplicatedStorage');
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 
 local Auxiliary = require(Shared.Utility.Auxiliary);
 

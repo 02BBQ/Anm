@@ -4,10 +4,11 @@ local Shared = ReplicatedStorage.Shared;
 
 return {
 	Shared = require(script.Shared);
-	Maid = require(Shared.Utility.Maid);
-	BoatTween = require(Shared.Utility.BoatTween);
-	BridgeNet = require(Shared.Components.BridgeNet2);
+	Maid = require(Shared.Package.Maid);
+	BoatTween = require(Shared.Package.BoatTween);
+	BridgeNet = require(Shared.Package.BridgeNet2);
 	Wiki = require(Shared.Wiki);
+	Crater = require(Shared.Package.Crater_Module);
 
 	Attribute = require(Shared.Utility.Attribute);
 	-- ClientStateManager = require(Shared.Utility.ClientStateManager);

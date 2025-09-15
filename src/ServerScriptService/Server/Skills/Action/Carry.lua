@@ -3,7 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
 
 local Shared = ReplicatedStorage.Shared;
-local SharedComponents = Shared.Components;
+local SharedComponents = Shared.Services;
 local Server = ServerScriptService.Server;
 
 local Wiki = require(Shared.Wiki);
