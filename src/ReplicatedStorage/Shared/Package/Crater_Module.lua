@@ -154,10 +154,15 @@ end
 --/ @modules 'shared' \--
 local Auxiliary = {}
 Auxiliary.RaycastParams = {}
+Auxiliary.OverlapParams = {}
 
 Auxiliary.RaycastParams.Map = RaycastParams.new()
 Auxiliary.RaycastParams.Map.FilterType = Enum.RaycastFilterType.Include
 Auxiliary.RaycastParams.Map.FilterDescendantsInstances = {Map}
+
+Auxiliary.OverlapParams.Map = OverlapParams.new()
+Auxiliary.OverlapParams.Map.FilterType = Enum.RaycastFilterType.Include
+Auxiliary.OverlapParams.Map.FilterDescendantsInstances = {Map}
 
 function Auxiliary:Raycast(Origin: Vector3, Direction: Vector3): RaycastResult
 	return workspace:Raycast(Origin, Direction, Auxiliary.RaycastParams.Map)
@@ -205,7 +210,7 @@ local function getPartsInRegion(part)
         end)
         
         -- Get all parts currently touching this part
-        local touchingParts = part:GetTouchingParts()
+        local touchingParts = workspace:GetPartsInPart(part, Auxiliary.OverlapParams.Map) --part:GetTouchingParts()
         
         -- Disconnect the temporary connection
         connection:Disconnect()
@@ -690,7 +695,6 @@ function Crater:Impact(data: ImpactData)
 	if not data.NoCrater then
 		local isSandOrSnow = hitPart.Material == Enum.Material.Sand 
 			or hitPart.Material == Enum.Material.Snow
-		
 		-- 지면 파편 효과
 		Crater:createDebrisEffect({
 			ground = hitPart,                    -- v23505 = hitPart
@@ -941,7 +945,7 @@ function Crater:createDebrisEffect(config)
     for i = 1, largeDebrisCount do
         if not addConfig.less and not isWaterTerrain then
             local debrisPiece = getPooledPart() or Instance.new("Part")
-            debrisPiece.CollisionGroup = "nocol"
+            debrisPiece.CollisionGroup = "Debris"
             
             -- Random rotation
             local randomCFrame = config.cframe * CFrame.Angles(
@@ -1024,7 +1028,7 @@ function Crater:createDebrisEffect(config)
             local alignmentCFrame = alignToNormal(smallDebris.CFrame.UpVector, config.normal, Vector3.new(0, 1, 0))
             smallDebris.CFrame = smallDebris.CFrame * (alignmentCFrame * CFrame.Angles(math.pi/2, 0, 0))
             
-            smallDebris.CollisionGroup = "nocol"
+            smallDebris.CollisionGroup = "Debris"
             local debrisSize = getRandomNumber(0.6, 0.8)
             smallDebris.Size = Vector3.new(debrisSize, debrisSize, debrisSize)
             smallDebris.Color = config.ground.Color
@@ -1137,10 +1141,11 @@ function Crater:createDebrisEffect(config)
             
             -- Set collision group if needed
             if config.dontcollide == localPlayer then
-                groundPiece.CollisionGroup = "nocol"
+                groundPiece.CollisionGroup = "Debris"
             end
             
             -- Configure basic properties
+			groundPiece.Name = "GroundPiece"
             groundPiece.Anchored = true
             groundPiece.CanCollide = false
             groundPiece.CanTouch = true
@@ -1206,7 +1211,7 @@ function Crater:createDebrisEffect(config)
             end
             
             -- Check angle constraint if provided
-            local withinAngle = true
+            local withinAngle = config.angle
             if config.angle then
                 local angleCheck = config.anglecfr
                 local piecePos = originalCFrame.Position
@@ -1214,7 +1219,7 @@ function Crater:createDebrisEffect(config)
                 local direction = (projectedPos - angleCheck.p).unit
                 withinAngle = math.deg(math.acos(angleCheck.LookVector:Dot(direction))) <= config.angle
             end
-            
+
             -- Determine final appearance
             if shouldBreak or withinAngle then
                 if not isWaterTerrain then
