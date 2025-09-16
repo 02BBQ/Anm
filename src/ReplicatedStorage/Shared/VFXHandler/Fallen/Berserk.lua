@@ -65,7 +65,7 @@ VFX.start = function(Data)
         tasks = nil;
         Cancelled = true;
 		runMaid:Destroy();
-		task.delay(3,function()
+		task.delay(4,function()
 			runVFXMaid:Destroy();
 		end)
 	end;
@@ -73,6 +73,19 @@ VFX.start = function(Data)
 	Animation.Stopped:Connect(cancel);
 	
 	Auxiliary.Shared.WaitForMarker(Animation, "run")
+
+	local st = BindFX(runVFXMaid, Assets.Stutter);
+	st.CFrame = Root.CFrame;
+	st.Weld.Part0 = Root;
+	st.Parent = FXParent;
+
+	task.delay(1,function()
+		for _,v in pairs(st:GetDescendants()) do
+			if v:IsA("ParticleEmitter") then
+				v.Enabled = false;
+			end
+		end
+	end)
 	
 	table.insert(tasks, task.spawn(function()
 		for i=1,5 do
@@ -117,7 +130,19 @@ VFX.start = function(Data)
     runMaid:AddTask(run);
 	
 	Animation:GetMarkerReachedSignal("runEnd"):Connect(function()
-		runMaid:Destroy();
+		local drag = BindFX(runVFXMaid, Assets.drag);
+		drag.CFrame = Root.CFrame;
+		drag.Weld.Part0 = Root;
+		drag.Parent = FXParent;
+
+		task.delay(0.4,function()
+			for _,v in pairs(drag:GetDescendants()) do
+				if v:IsA("ParticleEmitter") then
+					v.Enabled = false;
+				end
+			end
+		end)
+		cancel();
 	end)
 end
 

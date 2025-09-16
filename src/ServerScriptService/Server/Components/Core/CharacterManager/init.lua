@@ -139,7 +139,6 @@ end;
 function CharacterManager:InitCharacter()
 	local Entity = self.Parent
 	
-	
 	local Rig = self.Rig;
 	self.Parent.Combat:Active(true);
 	self.Alive = true;

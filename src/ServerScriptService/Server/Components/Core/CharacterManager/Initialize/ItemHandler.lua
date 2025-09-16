@@ -50,6 +50,21 @@ CharacterHandler.Initialize = function(Entity)
 		ItemFactory.CreateItem(Entity, item);
 	end;
 
+    if Entity.Data.BaseClass then
+        local classSkills = ServerScriptService.Server.Skills.Class:FindFirstChild(Entity.Data.BaseClass);
+        if classSkills then
+            for _,spell in pairs(ServerScriptService.Server.Skills.Class[Entity.Data.BaseClass]:GetChildren()) do
+                if spell:IsA("ModuleScript") then
+                    local item = {};
+                    item.Name = spell.Name;
+                    item.Type = "Spell";
+        
+                    ItemFactory.CreateItem(Entity, item);
+                end
+            end
+        end
+    end
+
     local addCon = Entity.Character.Rig.ChildAdded:Connect(function(child)
         if child:IsA("Tool") and child:GetAttribute("Type") == "Weapon" then
             Entity.Character.Weapon:Equip(child.Name);
