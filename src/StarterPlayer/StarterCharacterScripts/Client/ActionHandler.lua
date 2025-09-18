@@ -66,6 +66,27 @@ local FetchTypes = {
 		return Humanoid.FloorMaterial;
 	end;
 
+	GetMouseTarget = function(Data)
+		local camera = workspace.CurrentCamera
+		local mouse = LocalPlayer:GetMouse()
+
+		local Target = nil
+		local Distance = Data or 0.4
+
+		local Position = CFrame.new(camera.CFrame.p, mouse.Hit.p)
+
+		for a, b in pairs(workspace.World.Alive:GetChildren()) do
+			if b.Name ~= LocalPlayer.Name and b:FindFirstChild("HumanoidRootPart") and b:FindFirstChild("Humanoid") and b:FindFirstChild("Humanoid").Health > 0 then
+				if (CFrame.new(camera.CFrame.p,  b.HumanoidRootPart.Position).lookVector - Position.lookVector).magnitude < Distance then
+					Distance = (CFrame.new(camera.CFrame.p,  b.HumanoidRootPart.Position).lookVector - Position.lookVector).magnitude
+					Target = b
+				end
+			end
+		end
+
+		return Target
+	end;
+
 	GetMouse = function(IgnoreCanCollide)
 		if IgnoreCanCollide then
 			local mousePos = UserInputService:GetMouseLocation();
@@ -98,10 +119,21 @@ end
 function ActionComponent:LMB(held: boolean)
 	local Character = LocalPlayer.Character;
 	local Tool = Character:FindFirstChildOfClass("Tool");
-
+	
 	local data = {held = held, tool = Tool, mousePos = FetchTypes.GetMouse(true)};
+	
+	if Tool then
+		local Attributes = Tool:FindFirstChild("Attributes");
+		if Attributes then
+			if Attributes:GetAttribute("IsAimAssist") then
+				data.target = CharacterHandler.GetMouseTarget(0.4);
+			end
+		end
+	end
+
 	_use:Fire({"M1", data})
 end
+
 
 function ActionComponent:Critical(held: boolean)
 	local data = {held = held};

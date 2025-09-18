@@ -14,8 +14,7 @@ local Assets = Shared.Assets.Resources.Fallen;
 
 local VFX = {};
 
-
-
+local _cache = {};
 
 
 VFX.start = function(Data)
@@ -32,7 +31,9 @@ VFX.start = function(Data)
 	
 	if not Animation then return end;
 
+	local uid = tick();
     local tasks = {};
+	
     local Cancelled = false;
 	local runMaid = Auxiliary.Maid.new();
 	local runVFXMaid = Auxiliary.Maid.new();
@@ -55,9 +56,18 @@ VFX.start = function(Data)
 
 	local cancel = function()
 		if Cancelled then return end;
+		for _,BasePart in pairs(runVFXMaid._tasks) do
+			if BasePart:IsA("BasePart") then
+				for _,ParticleEmitter in pairs(BasePart:GetDescendants()) do
+					if ParticleEmitter:IsA("ParticleEmitter") then
+						ParticleEmitter.Enabled = false;
+					end
+				end
+			end
+		end
         if bv then
-            TweenService:Create(bv,TweenInfo.new(0.4), {Velocity = Vector3.new(0,0,0)}):Play();
-            game.Debris:AddItem(bv, 0.35);
+            TweenService:Create(bv,TweenInfo.new(0.7), {Velocity = Vector3.new(0,0,0)}):Play();
+            game.Debris:AddItem(bv, 0.6);
         end
         for _,t in pairs(tasks) do
             task.cancel(t);
@@ -65,15 +75,18 @@ VFX.start = function(Data)
         tasks = nil;
         Cancelled = true;
 		runMaid:Destroy();
+		_cache[Data.uid] = nil;
 		task.delay(4,function()
 			runVFXMaid:Destroy();
 		end)
 	end;
+
+	_cache[Data.uid] = cancel;
 	
 	Animation.Stopped:Connect(cancel);
 	
 	Auxiliary.Shared.WaitForMarker(Animation, "run")
-
+	
 	local st = BindFX(runVFXMaid, Assets.Stutter);
 	st.CFrame = Root.CFrame;
 	st.Weld.Part0 = Root;
@@ -130,18 +143,6 @@ VFX.start = function(Data)
     runMaid:AddTask(run);
 	
 	Animation:GetMarkerReachedSignal("runEnd"):Connect(function()
-		local drag = BindFX(runVFXMaid, Assets.drag);
-		drag.CFrame = Root.CFrame;
-		drag.Weld.Part0 = Root;
-		drag.Parent = FXParent;
-
-		task.delay(0.4,function()
-			for _,v in pairs(drag:GetDescendants()) do
-				if v:IsA("ParticleEmitter") then
-					v.Enabled = false;
-				end
-			end
-		end)
 		cancel();
 	end)
 end
@@ -160,20 +161,89 @@ VFX.grab = function(Data)
 	
 	if not Animation then return end;
 
-    local grabMaid = Auxiliary.Maid.new();
+	if _cache[Data.uid] then
+		_cache[Data.uid]();
+		_cache[Data.uid] = nil;
+	end
 
-    local fx = Auxiliary.Shared.BindFX(grabMaid, Assets.berHit);
+    local grabMaid = Auxiliary.Maid.new();
+	local grabVFXMaid = Auxiliary.Maid.new();
+
+	local meshes2 = Auxiliary.Shared.BindFX(grabVFXMaid, Auxiliary.MeshEmitter.StartMeshEmitter(
+		Root,
+		Assets.Wind
+	));
+
+    local fx = Auxiliary.Shared.BindFX(grabVFXMaid, Assets.berHit);
     fx:PivotTo(Root.CFrame * CFrame.new(0,0,-5));
     fx.Parent = FXParent;
     Auxiliary.Shared.PlayAttachment(fx);
 
+	local meshes = Auxiliary.Shared.BindFX(grabVFXMaid, Auxiliary.MeshEmitter.StartMeshEmitter(
+		Root,
+		Assets.BerserkPunch
+	));
+	Auxiliary.Shared.PlayAttachment(meshes);
+
     local function cancel()
-        grabMaid:Destroy();
+		grabMaid:Destroy();
+		task.wait(4);
+        grabVFXMaid:Destroy();
     end
 
     Animation.Stopped:Connect(cancel);
 
+	Auxiliary.Shared.WaitForMarker(Animation, "slam");
+
+	if not Animation.IsPlaying then
+		cancel();
+		return;
+	end
+
+	Auxiliary.Crater:Impact({
+		Start = (Root.CFrame * CFrame.new(0,0,-3.5)).Position,
+		End = -Root.CFrame.UpVector,
+		Seed = tick(),             -- 랜덤 시드
+		NoSound = false,           -- 사운드 허용
+		NoCrater = false,          -- 크레이터 생성
+		Amount = 6;
+		NoSmoke = true,            -- 연기는 주석처리되어 사용 안됨
+		NoDebris = true,          -- 바위 파편 허용
+		amount = 6,                -- 지면 파편 개수
+		sizemult = 1.6,              -- 파편 크기 배수
+		size = 1.4,                   -- 크레이터 크기
+		DespawnTime = 5
+	})
+
+	local fx = Auxiliary.Shared.BindFX(grabVFXMaid, Assets.BSlam);
+	fx:PivotTo(Root.CFrame);
+	fx.Parent = FXParent;
+	Auxiliary.Shared.PlayAttachment(fx);
+
+	Auxiliary.Shared.WaitForMarker(Animation, "spin");
+	Auxiliary.Shared.BindFX(grabVFXMaid, Auxiliary.MeshEmitter.StartMeshEmitter(
+		Root,
+		Assets.WindSpin
+	));
+
     Auxiliary.Shared.WaitForMarker(Animation, "throw");
+
+	if not Animation.IsPlaying then
+		cancel();
+		return;
+	end
+
+	local fx = Auxiliary.Shared.BindFX(grabVFXMaid, Assets.Jump);
+	fx:PivotTo(Root.CFrame * CFrame.new(0,-2.2,0) * CFrame.Angles(0,math.pi,0));
+	fx:ScaleTo(2);
+	fx.Parent = FXParent;
+	Auxiliary.Shared.PlayAttachment(fx);
+
+	local smoke = Auxiliary.Shared.BindFX(grabVFXMaid, Assets.Smoke);
+	smoke:PivotTo(Root.CFrame * CFrame.new(0,-2.2,0) * CFrame.Angles(0,math.pi,0));
+	smoke:ScaleTo(2);
+	smoke.Parent = FXParent;
+	Auxiliary.Shared.PlayAttachment(smoke);
 
     local bv = Auxiliary.Shared.CreateVelocity(Root, {MaxForce = Vector3.new(40000,0,40000)});
     grabMaid:AddTask(bv);

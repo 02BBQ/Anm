@@ -517,8 +517,8 @@ function Crater:ExplosionRocks(Data: RockData)
 				local BodyVelocity = Instance.new('BodyVelocity')
 				BodyVelocity.MaxForce = Vector3.one * 125000
 				BodyVelocity.P = 820
-				local t = Vector3.new(math.random(-20,20),math.random(30,40),math.random(-20,20))
-				BodyVelocity.Velocity = t
+				-- local t = Vector3.new(math.random(-20,20),math.random(30,40),math.random(-20,20))
+				BodyVelocity.Velocity = Velocity
 
 				BodyVelocity.Parent = Part
 				SpawnService:AddItem(BodyVelocity, 0.15)
@@ -697,15 +697,15 @@ function Crater:Impact(data: ImpactData)
 			or hitPart.Material == Enum.Material.Snow
 		-- 지면 파편 효과
 		Crater:createDebrisEffect({
-			ground = hitPart,                    -- v23505 = hitPart
-			cframe = CFrame.new(hitPos),         -- v23506 = hitPos
-			amount = (data.amount or isSandOrSnow and 7 or 10) / 1.25,  -- v1101 = data, v23516 = isSandOrSnow
-			normal = hitNormal,                  -- v23508 = hitNormal
-			sand = isSandOrSnow and true or nil, -- v23516 = isSandOrSnow
+			ground = hitPart,                    
+			cframe = CFrame.new(hitPos),         
+			amount = (data.amount or isSandOrSnow and 7 or 10) / 1.25,
+			normal = hitNormal,                  
+			sand = isSandOrSnow and true or nil, 
 			add = {
 				sounds = true
 			}, 
-			sizemult = data.sizemult,            -- v1101 = data
+			sizemult = data.sizemult,           
 			new = {
 				5 * (data.size or 1), 
 				5.5 * (data.size or 1)

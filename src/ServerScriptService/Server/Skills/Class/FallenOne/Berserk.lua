@@ -9,6 +9,8 @@ local Spell = require(ServerScriptService.Server.Skills.Spell):Extend();
 Spell.Name = script.Name;
 Spell.CastSign = 0;
 
+local seed = Random.new();
+
 function Spell:OnCast(Entity, Args)
 	if not Args["held"] then return end;
 	if not Entity.Combat:CanUse() then return end;
@@ -17,8 +19,10 @@ function Spell:OnCast(Entity, Args)
 
 	local Start : AnimationTrack = Entity.Animator:Fetch("Fallen/BStart");
 	Start:Play();
+
+	local uid = tick()..seed:NextNumber();
 	
-	Entity.VFX:Fire("Fallen/Berserk", {Action = "start", ID = Start.Animation.AnimationId});
+	Entity.VFX:Fire("Fallen/Berserk", {Action = "start", ID = Start.Animation.AnimationId, uid = uid});
 	
 	Auxiliary.Shared.WaitForMarker(Start, "run")
 	
@@ -62,7 +66,7 @@ function Spell:OnCast(Entity, Args)
 				end
 			end
 
-            Entity.VFX:Fire("Fallen/Berserk", {Action = "grab", ID = User.Animation.AnimationId});
+            Entity.VFX:Fire("Fallen/Berserk", {Action = "grab", ID = User.Animation.AnimationId, uid = uid});
 			
 			Victim.Stopped:Wait();
 			

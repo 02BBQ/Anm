@@ -52,12 +52,19 @@ CharacterHandler.Initialize = function(Entity)
 
     if Entity.Data.BaseClass then
         local classSkills = ServerScriptService.Server.Skills.Class:FindFirstChild(Entity.Data.BaseClass);
+        
         if classSkills then
             for _,spell in pairs(ServerScriptService.Server.Skills.Class[Entity.Data.BaseClass]:GetChildren()) do
                 if spell:IsA("ModuleScript") then
                     local item = {};
                     item.Name = spell.Name;
                     item.Type = "Spell";
+                    
+
+                    for name, value in spell:GetAttributes() do
+                        item.Attributes = item.Attributes or {};
+                        item.Attributes[name] = value;
+                    end
         
                     ItemFactory.CreateItem(Entity, item);
                 end

@@ -199,6 +199,8 @@ VFX.start = function(Data)
 	local shatterMaid = Auxiliary.Maid.new();
 	
 	local endMaid = Auxiliary.Maid.new();
+
+	local RockTask;
 	
 	local function isValid()
 		if not Animation.IsPlaying then
@@ -227,9 +229,8 @@ VFX.start = function(Data)
 	PlayAttachment(Au);
 
 	local cancel = function()
-		task.delay(1,function()
+		task.delay(4,function()
 			shatterMaid:Destroy();
-			task.wait(4);
 			endMaid:Destroy();
 		end)
 		run:Disconnect();
@@ -240,55 +241,92 @@ VFX.start = function(Data)
 	
 	Animation.Stopped:Connect(cancel);
 	
-	shatterMaid:AddTask(Animation:GetMarkerReachedSignal("rightstep"):Connect(function()
-		local off = CFrame.new(0.912, -3, -.3);
-		local step1 = BindFX(shatterMaid, Assets.Step1Fx);
-		step1.CFrame = Root.CFrame * off;
-		step1.Parent = FXParent;
-		PlayAttachment(step1);
-	end));
+	Auxiliary.Shared.WaitForMarker(Animation, "rightstep");
+	local off = CFrame.new(0.912, -3, -.3);
+	local step1 = BindFX(shatterMaid, Assets.Step1Fx);
+	step1.CFrame = Root.CFrame * off;
+	step1.Parent = FXParent;
+	PlayAttachment(step1);
 	
-	shatterMaid:AddTask(Animation:GetMarkerReachedSignal("leftstep"):Connect(function()
-		local off = CFrame.new(-0.912, -3, -.3);
-		local step1 = BindFX(shatterMaid, Assets.Step1Fx);
-		step1.CFrame = Root.CFrame * off;
-		step1.Parent = FXParent;
-		PlayAttachment(step1);
-	end));
+	Auxiliary.Shared.WaitForMarker(Animation, "leftstep");
+	local off = CFrame.new(-0.912, -3, -.3);
+	local step1 = BindFX(shatterMaid, Assets.Step1Fx);
+	step1.CFrame = Root.CFrame * off;
+	step1.Parent = FXParent;
+	PlayAttachment(step1);
+
+	local ended = false;
 	
-	shatterMaid:AddTask(Animation:GetMarkerReachedSignal("Slashs"):Connect(function()
-		speed = 65;
-		
-		local fx = BindFX(shatterMaid, Assets.ultthukuna);
-		fx.CFrame = Root.CFrame;
-		local weldaura2 = Instance.new("Weld",fx);
-		weldaura2.Part0 = Root;
-		weldaura2.Part1 = fx;
-		weldaura2.C0 = CFrame.new(0,0,0);
-		fx.Parent = FXParent;
-		PlayAttachment(fx);
-		
-		for _,v in pairs(Data.Caster.Character.Rig:GetChildren()) do
-			if v:IsA("BasePart") and string.find(v.Name, "Arm") or string.find(v.Name, "Leg") or string.find(v.Name, "Torso") or string.find(v.Name, "Head") then
-				v.Transparency = 1;
+	Auxiliary.Shared.WaitForMarker(Animation, "Slashs");
+	speed = 65;
+
+	RockTask = task.spawn(function()
+		while isValid() and not ended do
+			Auxiliary.Crater:ExplosionRocks({
+				Position = Root.Position,	
+				Amount = math.floor(4 * 0.5),
+				Size = {
+					Vector3.one * 1.5,
+					Vector3.one * 3,
+				},
+				Force = {
+					X = {-45, 45},
+					Y = {1,45},
+					Z = {-45, 45}
+				},
+				Trail = false,
+				DespawnTime = 3
+			})
+			task.wait(0.1);
+		end
+	end)
+	
+	local fx = BindFX(shatterMaid, Assets.ultthukuna);
+	fx.CFrame = Root.CFrame;
+	local weldaura2 = Instance.new("Weld",fx);
+	weldaura2.Part0 = Root;
+	weldaura2.Part1 = fx;
+	weldaura2.C0 = CFrame.new(0,0,0);
+	fx.Parent = FXParent;
+	
+	for _,v in pairs(Data.Caster.Character.Rig:GetChildren()) do
+		if v:IsA("BasePart") and string.find(v.Name, "Arm") or string.find(v.Name, "Leg") or string.find(v.Name, "Torso") or string.find(v.Name, "Head") then
+			v.Transparency = 1;
+		end
+	end
+
+	
+	Auxiliary.Shared.WaitForMarker(Animation, "end slashs");
+
+	ended = false;
+
+	if RockTask then
+		task.cancel(RockTask);
+	end
+	for _,v in pairs(Data.Caster.Character.Rig:GetChildren()) do
+		if v:IsA("BasePart") and string.find(v.Name, "Arm") or string.find(v.Name, "Leg") or string.find(v.Name, "Torso") or string.find(v.Name, "Head") then
+			v.Transparency = 0;
+		end
+	end
+
+	for _,BasePart in pairs(shatterMaid._tasks) do
+		if typeof(BasePart) == "Instance" and BasePart:IsA("BasePart") then
+			for _,ParticleEmitter in pairs(BasePart:GetDescendants()) do
+				if ParticleEmitter:IsA("ParticleEmitter") then
+					ParticleEmitter.Enabled = false;
+				end
 			end
 		end
-	end));
+	end
+	cancel();
 	
-	shatterMaid:AddTask(Animation:GetMarkerReachedSignal("end slashs"):Connect(function()
-		for _,v in pairs(Data.Caster.Character.Rig:GetChildren()) do
-			if v:IsA("BasePart") and string.find(v.Name, "Arm") or string.find(v.Name, "Leg") or string.find(v.Name, "Torso") or string.find(v.Name, "Head") then
-				v.Transparency = 0;
-			end
-		end
-		
-		local fx = BindFX(endMaid, Assets.EMIT);
-		fx.CFrame = Root.CFrame;
-		fx.Parent = FXParent;
-		PlayAttachment(fx);
-		
-		cancel();
-	end));
+	Auxiliary.Shared.WaitForMarker(Animation, "jump");
+
+	local fx = BindFX(endMaid, Assets.EMIT);
+	fx.CFrame = Root.CFrame;
+	fx.Parent = FXParent;
+	PlayAttachment(fx);
+	
 end
 
 return VFX;

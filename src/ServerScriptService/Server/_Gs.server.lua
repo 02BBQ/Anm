@@ -6,3 +6,4 @@ local Server = ServerScriptService.Server;
 local ServerComponents = Server.Components;
 
 _G.BridgeNet2 = require(Shared.Package.BridgeNet2)
+_G.FindEntity = require(ServerComponents.Core.EntityManager).Find

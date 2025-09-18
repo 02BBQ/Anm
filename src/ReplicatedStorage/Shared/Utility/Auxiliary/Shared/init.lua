@@ -128,6 +128,14 @@ Auxiliary.ClearAllMovers = function(Part: BasePart)
 	end
 end
 
+Auxiliary.Invis = function(Rig: Model?, invis: boolean)
+	for _,v in pairs(Rig:GetChildren()) do
+		if v:IsA("BasePart") and string.find(v.Name, "Arm") or string.find(v.Name, "Leg") or string.find(v.Name, "Torso") or string.find(v.Name, "Head") then
+			v.Transparency = invis and 1 or 0;
+		end
+	end
+end
+
 -- Creates and plays a tween with automatic cleanup
 -- Parameters:
 --   target: The object to tween (Instance)
