@@ -30,6 +30,8 @@ CombatManager.new = function(Entity: {})
 		
 		Parent = Entity;	
 		_Trove = TroveClass.new();
+
+		AirtimeManager = require(Server.Components.Game.AirtimeManager);
 		
 		Cancellables = {};
 		MobilityQueue = {};
@@ -51,11 +53,17 @@ CombatManager.new = function(Entity: {})
 		
 		ComboTick = 0;
 		Combo = 1;
+
+		_isAirborne = false;
 		
 	}, CombatManager);
 
 	return self;
 end;
+
+function CombatManager:IsAirborne()
+	return self._isAirborne;
+end
 
 function CombatManager:IsStunned()
 	local Character = self.Parent.Character.Rig;
@@ -162,7 +170,7 @@ function CombatManager:Parry()
 	local ParryingWindow = 0.22;
 	self:AddParryingFrame();
 
-	local anim = self.Parent.Animator:Fetch('Universal/Parry');
+	local anim = self.Parent.Animator:Fetch('Weapons/Fist/Parry');
 	anim:Play();
 
 	task.delay(ParryingWindow, function()
@@ -191,6 +199,8 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 	local function OnHit()
 
 		if self:IsParrying() and not DamageData.NotParryable then
+			self.Parent.Animator:Fetch('Weapons/Fist/Parrying1');
+
 			entity.Cooldowns:Reset('Parry', 1);
 			attackerEntity.Combat:AttemptCancel(DamageData.Cancel or 1);
 			attackerEntity.EffectReplicator:CreateEffect("Stunned"):Debris();
@@ -201,27 +211,43 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 					Sound = "Hit/Parry";
 				}, BridgeNet.AllPlayers())
 
-			return	end
+			return;
+		end
 
 		if DamageData.BypassBlock then
 			self:RemoveBlock();
 		end
 
 		if self:IsBlocking(DamageData) and not DamageData.BypassBlock then
-			self._Block.Posture -= (Damage or 0);
+			self.Parent.Animator:Fetch('Weapons/Fist/Parrying1'):Play();
 
-			if self._Block.Posture <= 0 then
-				self:BlockBreak();
-			else
-				self.Parent.Animator:Fetch('Universal/Block/Hurt/'..math.random(1,3)):Play();
-				entity.VFX:Fire("HitEffect",
+			entity.Cooldowns:Reset('Parry', 1);
+			attackerEntity.Combat:AttemptCancel(DamageData.Cancel or 1);
+			attackerEntity.EffectReplicator:CreateEffect("Stunned"):Debris();
+			entity.VFX:Fire("HitEffect",
 				{
 					Root = attacker.HumanoidRootPart;
 					Type = "Parry";
 					Sound = "Hit/Parry";
 				}, BridgeNet.AllPlayers())
-				return;
-			end
+
+			return	
+
+			
+			-- self._Block.Posture -= (Damage or 0);
+
+			-- if self._Block.Posture <= 0 then
+			-- 	self:BlockBreak();
+			-- else
+			-- 	self.Parent.Animator:Fetch('Universal/Block/Hurt/'..math.random(1,3)):Play();
+			-- 	entity.VFX:Fire("HitEffect",
+			-- 	{
+			-- 		Root = attacker.HumanoidRootPart;
+			-- 		Type = "Parry";
+			-- 		Sound = "Hit/Block";
+			-- 	}, BridgeNet.AllPlayers())
+			-- 	return;
+			-- end
 		end
 
 		if DamageData.Knockback then
@@ -288,16 +314,6 @@ function CombatManager:Knockback(Data)
 	local TargetEntity = self.Parent;
 	if TargetEntity.Player and TargetEntity.Character.Root:GetNetworkOwner() == TargetEntity.Player then
 		Knockback:Fire(TargetEntity.Player, {Entity = TargetEntity:GetClientEntity(); Data = Data});
-		--[[
-			Data.attacker,
-			Data.Velocity,
-			Data.Push,
-			Data.AngularVelocity,
-			Data.MaxForce,
-			Data.Duration,
-			Data.Ease,
-			Data.Stay
-		]]
 	else
 		local TrueVelocity = Data.Velocity or ((Data.attacker or self.Parent.Character.Root.CFrame).LookVector * Data.Push);
 		--TargetEntity.Character:AssignOwnership(self.Parent.Player);

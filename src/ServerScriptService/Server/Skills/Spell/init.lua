@@ -12,6 +12,7 @@ local Spell = Object:Extend();
 Sound:Cache();
 local random = Random.new();
 
+Spell.Sound = Sound;
 Spell.CastSign = 3;
 Spell.Cooldown = 5;
 Spell.Name = script.Name;

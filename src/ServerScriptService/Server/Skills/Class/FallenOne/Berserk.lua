@@ -24,7 +24,14 @@ function Spell:OnCast(Entity, Args)
 	
 	Entity.VFX:Fire("Fallen/Berserk", {Action = "start", ID = Start.Animation.AnimationId, uid = uid});
 	
+	Spell.Sound.Spawn("Fallen/Berserk_Wind_Up", Entity.Character.Root, 5);
+	
+	Auxiliary.Shared.WaitForMarker(Start, "sound1")
+	
+	local walk = Spell.Sound.Spawn("Fallen/Berserk_Running", Entity.Character.Root, 5);
+	
 	Auxiliary.Shared.WaitForMarker(Start, "run")
+	
 	
 	local result = Shared.Remotes.Hitbox:InvokeClient(Entity.Player, {
 		caster = Entity:GetClientEntity();
@@ -47,12 +54,16 @@ function Spell:OnCast(Entity, Args)
 			local User : AnimationTrack = Entity.Animator:Fetch("Fallen/Berserk Hit");
 			User:Play();
 			
+			walk:Destroy();
+			
 			local Weld = Instance.new('Weld', Entity.Character.Rig);
 			Weld.Name = 'CarryWeld';
 			Weld.Part0 = Entity.Character.Root;
 			Weld.Part1 = EnemyEntity.Character.Root;
 			Weld.C0 = CFrame.new(0, 0, -8) * CFrame.Angles(0,math.pi,0);
 			
+			Spell.Sound.Spawn("Fallen/Berserk_Victim", Entity.Character.Root, 5);
+		
 			local Victim : AnimationTrack = EnemyEntity.Animator:Fetch("Fallen/Berserk Victim");
 			Victim:Play();
 			

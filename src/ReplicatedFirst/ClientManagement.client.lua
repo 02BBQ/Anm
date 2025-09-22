@@ -6,15 +6,14 @@ local assets = {
 	ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Assets"):WaitForChild("Animations"),
 }
 
-ContentProvider:PreloadAsync(assets)
-
-print("All assets loaded.")
-
-
 local BridgeNet2 = require(ReplicatedStorage.Shared.Package.BridgeNet2);
 local EffectHandler = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("VFXHandler"));
 local Sound = require(ReplicatedStorage.Shared.Utility.SoundHandler);
 Sound:Cache();
+
+_G.Sound = Sound;
+
+ContentProvider:PreloadAsync(assets)
 
 local _effect = BridgeNet2.ReferenceBridge('_effect');
 local player = Players.LocalPlayer

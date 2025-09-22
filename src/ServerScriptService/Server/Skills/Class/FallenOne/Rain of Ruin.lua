@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage");
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService");
 
 local Shared = ReplicatedStorage.Shared;
@@ -8,6 +9,8 @@ local Auxiliary = require(Shared.Utility.Auxiliary);
 local Spell = require(ServerScriptService.Server.Skills.Spell):Extend();
 Spell.Name = script.Name;
 Spell.CastSign = 0;
+
+local seed = Random.new();
 
 function Spell:OnCast(Entity, Args)
 	if not Args["held"] then return end;
@@ -33,18 +36,36 @@ function Spell:OnCast(Entity, Args)
 	dir = Vector3.new(dir.X, 1.7, dir.Z).Unit;
 	local ray: RaycastResult = workspace:Raycast(EnemyEntity.Character.Root.Position, dir * 25, Auxiliary.Shared.RayParams.Map);
 	local goal = EnemyEntity.Character.Root.Position + dir * (ray and ray.Distance or 25);
-	dir = Vector3.new(dir.X, 0, dir.Z).Unit;
-	Entity.Character.Rig:PivotTo(CFrame.new(goal, goal - dir));
+	local y0dir = Vector3.new(dir.X, 0, dir.Z).Unit;
+	Entity.Character.Rig:PivotTo(CFrame.new(goal, goal - y0dir));
 	
 	local bp = Auxiliary.Shared.CreatePosition(Entity.Character.Root);
 	bp.Position = goal;
 
 	Auxiliary.Shared.WaitForMarker(Start, "slash");
+
+	local lastTick = 0;
+	local shotSpeed = 0.05;
+	local uid = tostring(seed:NextNumber())..tostring(tick())
+	local elapsed = 25;
 	
-	Entity.VFX:Fire("Fallen/Ruin", {Action = "slash", ID = Start.Animation.AnimationId});
+	local rush rush = RunService.Heartbeat:Connect(function(dt)
+		elapsed += dt*20;
+		local ray: RaycastResult = workspace:Raycast(EnemyEntity.Character.Root.Position, dir * elapsed, Auxiliary.Shared.RayParams.Map);
+		local goal = EnemyEntity.Character.Root.Position + dir * (ray and ray.Distance or elapsed);
+
+		bp.Position = goal;
+
+		if tick() - lastTick >= shotSpeed then
+			lastTick = tick();
+			Entity.VFX:Fire("Fallen/Ruin", {Action = "slash", ID = Start.Animation.AnimationId, UID = uid, 
+			goal = EnemyEntity.Character.Root, dir = dir});
+		end
+	end);
 	
 	Start.Stopped:Wait();
 	bp:Destroy();
+	rush:Disconnect();
 end;
 
 

@@ -118,9 +118,14 @@ end
 
 function ActionComponent:LMB(held: boolean)
 	local Character = LocalPlayer.Character;
+	
 	local Tool = Character:FindFirstChildOfClass("Tool");
 	
 	local data = {held = held, tool = Tool, mousePos = FetchTypes.GetMouse(true)};
+
+	if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+		_use:Fire({"RMB", data});
+	end
 	
 	if Tool then
 		local Attributes = Tool:FindFirstChild("Attributes");

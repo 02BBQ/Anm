@@ -109,6 +109,7 @@ return function(Data, CharacterHandler)
 	end)
 
 	_use:Fire({"Action", "Dash", {MoveDirection = GetMoveDirection(Character)}})
+	_G.Sound.Spawn("AirDash", HRP, 3)
 
 	local MoveDirection = GetMoveDirection(Character)
 	local IsSide = MoveDirection == 'Left' or MoveDirection == 'Right'

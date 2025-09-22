@@ -22,9 +22,11 @@ humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
 humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
 humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
 
+character.HumanoidRootPart.Running.Volume = 0
+
 local initialize = function()
 	InputHandler:BindAction(Enum.UserInputType.MouseButton1, ActionHandler.LMB);
-	InputHandler:BindAction(Enum.UserInputType.MouseButton2, ActionHandler.RMB);
+	-- InputHandler:BindAction(Enum.UserInputType.MouseButton2, ActionHandler.RMB);
 	InputHandler:BindAction(Enum.KeyCode.R, ActionHandler.Critical);
 	InputHandler:BindAction(Enum.KeyCode.F, ActionHandler.Block);
 	InputHandler:BindAction(Enum.KeyCode.Q, ActionHandler.Dash);

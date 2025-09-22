@@ -56,6 +56,7 @@ return function(Params)
 		if Entity.Combat.Combo > maxCombo then
 			Entity.Cooldowns:Add("LightAttack", comboResetTime)
 		end
+		Entity.Combat:Active(true);
 	end)
 
 	Auxiliary.Shared.WaitForMarker(Animation, "hitreg");
@@ -69,6 +70,10 @@ return function(Params)
 		local DamageData = {
 			Damage = WeaponInfo.Damage;
 			Sound = "Hit/Punch"..math.random(1,3);
+			Knockback = {Push = 10, Duration = 0.12};
+			OnHit = function()
+				Entity.Combat.AirtimeManager:MaintainAirtime(Entity, EnemyEntity, 1);
+			end;
 		}
 		EnemyEntity.Combat:TakeDamage(DamageData, Entity);
 	end
