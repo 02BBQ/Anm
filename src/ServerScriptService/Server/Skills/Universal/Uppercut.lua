@@ -41,7 +41,7 @@ return function(Params)
 		local DamageData = {
 			Damage = 10;
 			Sound = "Hit/Punch"..math.random(1,3);
-			Knockback = {Velocity = Entity.Character.Root.CFrame.LookVector * 20 + Vector3.new(0,75 ,0), Duration = 0.25};
+			Knockback = {Velocity = Entity.Character.Root.CFrame.LookVector * 12.5 + Vector3.new(0,40 ,0), Duration = 0.225};
 			Ragdoll = {Duration = 2};
 		}
 		EnemyEntity.Combat:TakeDamage(DamageData, Entity);

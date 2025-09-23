@@ -251,7 +251,7 @@ function CombatManager:TakeDamage(DamageData, attackerEntity)
 		end
 
 		if DamageData.Knockback then
-			DamageData.attacker = attackerEntity;
+			DamageData.Knockback.attacker = attackerEntity;	
 			self:Knockback(DamageData.Knockback)
 			if DamageData.Knockback.Follow then
 				attackerEntity.Combat:Knockback(DamageData.Knockback)
@@ -315,7 +315,10 @@ function CombatManager:Knockback(Data)
 	if TargetEntity.Player and TargetEntity.Character.Root:GetNetworkOwner() == TargetEntity.Player then
 		Knockback:Fire(TargetEntity.Player, {Entity = TargetEntity:GetClientEntity(); Data = Data});
 	else
-		local TrueVelocity = Data.Velocity or ((Data.attacker or self.Parent.Character.Root.CFrame).LookVector * Data.Push);
+		local dir = self.Parent.Character.Root.Position - Data.attacker.Character.Root.Position;
+		dir = dir.Unit;
+
+		local TrueVelocity = Data.Velocity or ((dir or self.Parent.Character.Root.CFrame.LookVector) * Data.Push);
 		--TargetEntity.Character:AssignOwnership(self.Parent.Player);
 
 		if Data.AngularVelocity then

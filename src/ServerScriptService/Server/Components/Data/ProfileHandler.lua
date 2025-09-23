@@ -26,6 +26,12 @@ ProfileHandler.Constants = {
 		Inventory = {};
 		Spells = {};
 		
+		Accessories = {
+			Head = "";
+			Face = "";
+			Back = "";
+			Leg = "";
+		};
 	};
 };
 

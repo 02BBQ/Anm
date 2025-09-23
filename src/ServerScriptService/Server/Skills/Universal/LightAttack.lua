@@ -70,11 +70,19 @@ return function(Params)
 		local DamageData = {
 			Damage = WeaponInfo.Damage;
 			Sound = "Hit/Punch"..math.random(1,3);
-			Knockback = {Push = 10, Duration = 0.12};
+			Knockback = {Push = 15, Duration = 0.12};
 			OnHit = function()
 				Entity.Combat.AirtimeManager:MaintainAirtime(Entity, EnemyEntity, 1);
 			end;
 		}
+
+		if Entity.Combat.Combo == 5 then
+			DamageData.Knockback.Push = 35;
+			DamageData.Damage = WeaponInfo.Damage * 1.2;
+
+			DamageData.Ragdoll = {Duration = 1.75};
+		end
+
 		EnemyEntity.Combat:TakeDamage(DamageData, Entity);
 	end
 

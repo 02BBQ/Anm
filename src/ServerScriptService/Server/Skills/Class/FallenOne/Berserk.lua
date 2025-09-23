@@ -14,6 +14,8 @@ local seed = Random.new();
 function Spell:OnCast(Entity, Args)
 	if not Args["held"] then return end;
 	if not Entity.Combat:CanUse() then return end;
+
+	local SkillMaid = Auxiliary.Maid.new();
 	
 	Entity.Combat:Active(false);
 
@@ -21,96 +23,114 @@ function Spell:OnCast(Entity, Args)
 	Start:Play();
 
 	local uid = tick()..seed:NextNumber();
+
+	local cantMove = Entity.EffectReplicator:CreateEffect("CantMove");
+	SkillMaid:AddTask(cantMove);
+
+	local skillTask;
+
+	local StartCancel = Entity.Combat:CreateCancel(1,function()
+		Start:Stop();
+	end)
+
+	Start.Stopped:Connect(function()
+		task.cancel(skillTask);
+		Entity.Combat:Active(true);
+		SkillMaid:Destroy();
+		StartCancel.Remove();
+	end)
 	
-	Entity.VFX:Fire("Fallen/Berserk", {Action = "start", ID = Start.Animation.AnimationId, uid = uid});
+	skillTask = task.spawn(function()
+		Entity.VFX:Fire("Fallen/Berserk", {Action = "start", ID = Start.Animation.AnimationId, uid = uid});
 	
-	Spell.Sound.Spawn("Fallen/Berserk_Wind_Up", Entity.Character.Root, 5);
-	
-	Auxiliary.Shared.WaitForMarker(Start, "sound1")
-	
-	local walk = Spell.Sound.Spawn("Fallen/Berserk_Running", Entity.Character.Root, 5);
-	
-	Auxiliary.Shared.WaitForMarker(Start, "run")
-	
-	
-	local result = Shared.Remotes.Hitbox:InvokeClient(Entity.Player, {
-		caster = Entity:GetClientEntity();
-		Time = 0.7;
-		size = Vector3.new(10, 10, 10);
-		offset = CFrame.new(0,0,-5);
-		single = true;
-		root = Entity.Character.Root;
-	})
-	
-	if result then
-		local hitbox = Entity:CreateHitbox()
-		hitbox.instance = Entity.Character.Root;
-		hitbox.size = Vector3.new(55,55,55);
-		hitbox.offset = CFrame.new(0,0,-25);
-		hitbox.detecting = {result};
-		hitbox.single = true;
-		hitbox.onHit = function(EnemyEntity)
-			Start:Stop();
-			local User : AnimationTrack = Entity.Animator:Fetch("Fallen/Berserk Hit");
-			User:Play();
-			
-			walk:Destroy();
-			
-			local Weld = Instance.new('Weld', Entity.Character.Rig);
-			Weld.Name = 'CarryWeld';
-			Weld.Part0 = Entity.Character.Root;
-			Weld.Part1 = EnemyEntity.Character.Root;
-			Weld.C0 = CFrame.new(0, 0, -8) * CFrame.Angles(0,math.pi,0);
-			
-			Spell.Sound.Spawn("Fallen/Berserk_Victim", Entity.Character.Root, 5);
+		SkillMaid:AddTask(Spell.Sound.Spawn("Fallen/Berserk_Wind_Up", Entity.Character.Root, 5));
 		
-			local Victim : AnimationTrack = EnemyEntity.Animator:Fetch("Fallen/Berserk Victim");
-			Victim:Play();
+		Auxiliary.Shared.WaitForMarker(Start, "sound1")
+		
+		local walk = Spell.Sound.Spawn("Fallen/Berserk_Running", Entity.Character.Root, 5);
+		SkillMaid:AddTask(walk);
+		
+		Auxiliary.Shared.WaitForMarker(Start, "run")
+		
+		local result = Shared.Remotes.Hitbox:InvokeClient(Entity.Player, {
+			caster = Entity:GetClientEntity();
+			Time = 0.7;
+			size = Vector3.new(10, 10, 10);
+			offset = CFrame.new(0,0,-5);
+			single = true;
+			root = Entity.Character.Root;
+		})
+		
+		if result then
+			local hitbox = Entity:CreateHitbox()
+			hitbox.instance = Entity.Character.Root;
+			hitbox.size = Vector3.new(55,55,55);
+			hitbox.offset = CFrame.new(0,0,-25);
+			hitbox.detecting = {result};
+			hitbox.single = true;
+			hitbox.onHit = function(EnemyEntity)
+				Start:Stop();
+				local User : AnimationTrack = Entity.Animator:Fetch("Fallen/Berserk Hit");
+				User:Play();
+				
+				walk:Destroy();
+				
+				local Weld = Instance.new('Weld', Entity.Character.Rig);
+				Weld.Name = 'CarryWeld';
+				Weld.Part0 = Entity.Character.Root;
+				Weld.Part1 = EnemyEntity.Character.Root;
+				Weld.C0 = CFrame.new(0, 0, -8) * CFrame.Angles(0,math.pi,0);
+				
+				Spell.Sound.Spawn("Fallen/Berserk_Victim", Entity.Character.Root, 5);
 			
-			Auxiliary.Shared.SetCollisionGroups(EnemyEntity.Character.Rig, "Carry");
-			for Index, Part in pairs(EnemyEntity.Character.Rig:GetChildren()) do
-				if Part:IsA'BasePart' then
-					if Part:GetAttribute'WasMassless' == nil then Part:SetAttribute('WasMassless', Part.Massless) end
-
-					Part.Massless = true
-					Part:SetNetworkOwner(Entity.Player);
-				end
-			end
-
-            Entity.VFX:Fire("Fallen/Berserk", {Action = "grab", ID = User.Animation.AnimationId, uid = uid});
-			
-			Victim.Stopped:Wait();
-			
-			Entity.Combat:Active(true);
-			
-			Weld:Destroy();
-			
-			Auxiliary.Shared.SetCollisionGroups(EnemyEntity.Character.Rig, "Entity");
-
-			if EnemyEntity.Character.Rig:IsDescendantOf(workspace) then
+				local Victim : AnimationTrack = EnemyEntity.Animator:Fetch("Fallen/Berserk Victim");
+				Victim:Play();
+				
+				Auxiliary.Shared.SetCollisionGroups(EnemyEntity.Character.Rig, "Carry");
 				for Index, Part in pairs(EnemyEntity.Character.Rig:GetChildren()) do
 					if Part:IsA'BasePart' then
 						if Part:GetAttribute'WasMassless' == nil then Part:SetAttribute('WasMassless', Part.Massless) end
 
-						Part.Massless = Part:GetAttribute'WasMassless'
-						Part:SetNetworkOwner(EnemyEntity.Player)
+						Part.Massless = true
+						Part:SetNetworkOwner(Entity.Player);
 					end
 				end
-			end
-			
-			local DamageData = {
-				Damage = 10;
-				Knockback = {Velocity = Entity.Character.Root.CFrame.LookVector * 5 + Vector3.new(0,75 ,0), Duration = 0.25};
-				Ragdoll = {Duration = 2};
-			}
-			EnemyEntity.Combat:TakeDamage(DamageData, Entity);
-		end
-		hitbox:Fire();
-	end
-	
-	Start.Stopped:Wait();
-	Entity.Combat:Active(true);
 
+				Entity.VFX:Fire("Fallen/Berserk", {Action = "grab", ID = User.Animation.AnimationId, uid = uid});
+				
+				Victim.Stopped:Wait();
+				
+				Entity.Combat:Active(true);
+				
+				Weld:Destroy();
+				
+				Auxiliary.Shared.SetCollisionGroups(EnemyEntity.Character.Rig, "Entity");
+
+				if EnemyEntity.Character.Rig:IsDescendantOf(workspace) then
+					for Index, Part in pairs(EnemyEntity.Character.Rig:GetChildren()) do
+						if Part:IsA'BasePart' then
+							if Part:GetAttribute'WasMassless' == nil then Part:SetAttribute('WasMassless', Part.Massless) end
+
+							Part.Massless = Part:GetAttribute'WasMassless'
+							Part:SetNetworkOwner(EnemyEntity.Player)
+						end
+					end
+				end
+				
+				local DamageData = {
+					Damage = 10;
+					Knockback = {Velocity = Entity.Character.Root.CFrame.LookVector * 5 + Vector3.new(0,75 ,0), Duration = 0.25};
+					Ragdoll = {Duration = 2};
+				}
+				EnemyEntity.Combat:TakeDamage(DamageData, Entity);
+			end
+			hitbox:Fire();
+		end
+		
+		Start.Stopped:Wait();
+		Entity.Combat:Active(true);
+		cantMove:Destroy(); 
+	end)
 end;
 
 
