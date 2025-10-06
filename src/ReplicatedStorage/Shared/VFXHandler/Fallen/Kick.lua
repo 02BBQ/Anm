@@ -48,9 +48,30 @@ VFX.start = function(Data)
 	smoke.Parent = FXParent;
 	Auxiliary.Shared.PlayAttachment(smoke);
 
-	Animation:GetMarkerReachedSignal("kick"):Connect(function()
-		bp:Destroy();
-	end);
+	Auxiliary.Shared.WaitForMarker(Animation, "kick")
+	bp:Destroy();
+	
+	local meshVFX = Auxiliary.Maid.new();
+	
+	local part = Assets.nothing:Clone();
+	part.CFrame = Root.CFrame * CFrame.new(0,0,-3) * CFrame.Angles(0,0,math.pi/2);
+	part.Parent = workspace.World.Debris;
+	
+	local meshes2: Model = Auxiliary.Shared.BindFX(meshVFX, Auxiliary.MeshEmitter.StartMeshEmitter(
+		part,
+		Assets.Disdzxmantle
+		));
+	
+	Auxiliary.Shared.BindFX(meshVFX,part);
+	
+	local fx = Auxiliary.Shared.BindFX(meshVFX, Assets.SpaceDistortion);
+	fx:PivotTo(part.CFrame * CFrame.new(0,0,-3));
+	fx.Parent = FXParent;
+	Auxiliary.Shared.PlayAttachment(fx);
+	
+	task.delay(5,function()
+		meshVFX:Destroy();
+	end)
 end
 
 return VFX;

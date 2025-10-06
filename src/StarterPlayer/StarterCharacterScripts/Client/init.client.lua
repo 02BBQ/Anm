@@ -22,7 +22,7 @@ humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false);
 humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics, false);
 humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false);
 
-character.HumanoidRootPart.Running.Volume = 0
+--character.HumanoidRootPart.Running.Volume = 0
 
 local initialize = function()
 	InputHandler:BindAction(Enum.UserInputType.MouseButton1, ActionHandler.LMB);
