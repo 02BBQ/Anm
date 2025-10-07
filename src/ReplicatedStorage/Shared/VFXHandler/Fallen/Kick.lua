@@ -126,11 +126,11 @@ VFX.start = function(Data)
 		Seed = tick(),             -- 랜덤 시드
 		NoSound = false,           -- 사운드 허용
 		NoCrater = false,          -- 크레이터 생성
-		Amount = 7;
+		Amount = 17;
 		NoSmoke = true,            -- 연기는 주석처리되어 사용 안됨
 		NoDebris = true,          -- 바위 파편 허용
 		amount = 7,                -- 지면 파편 개수
-		sizemult = 2.5,              -- 파편 크기 배수
+		sizemult = 4,              -- 파편 크기 배수
 		size = 5,                   -- 크레이터 크기
 		DespawnTime = 5
 	})
