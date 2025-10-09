@@ -43,6 +43,10 @@ VFX.start = function(Data)
 	rootFX.CFrame = Root.CFrame;
 	rootFX.Weld.Part0 = Root;
 	rootFX.Parent = FXParent;
+
+	task.delay(7, function()
+		VFXMaid:Destroy();
+	end)
 	
 	Auxiliary.Shared.PlayAttachment(rootFX.Charge);
 	
@@ -75,10 +79,6 @@ VFX.start = function(Data)
 		claw2.Weld.C0 *= CFrame.Angles(0,math.pi*4*deltaTime,0);
 	end)
 
-	task.delay(7, function()
-		VFXMaid:Destroy();
-	end)
-
 	Auxiliary.Shared.WaitForMarker(Animation, "first");
 
 	Auxiliary.Shared.PlayAttachment(rootFX.RootEmit);
@@ -97,7 +97,7 @@ VFX.start = function(Data)
 	Tween:Play();
 	
 	local speed = Instance.new("NumberValue");
-	speed.Value = 100;
+	speed.Value = 120;
 	firstMaid:AddTask(speed);
 
 	local bv: BodyVelocity;
