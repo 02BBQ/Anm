@@ -33,6 +33,11 @@ VFX.start = function(Data)
 
     local secondMaid = Auxiliary.Maid.new();
 
+    local charge = Auxiliary.Shared.BindFX(secondMaid, Assets.charage);
+    charge:PivotTo(Root.CFrame);
+    charge.Parent = DebrisFolder
+    Auxiliary.Shared.PlayAttachment(charge);
+
     local web = Auxiliary.Shared.BindFX(secondMaid, Assets.Webs);
     web:PivotTo(Root.CFrame);
     web.Parent = DebrisFolder
