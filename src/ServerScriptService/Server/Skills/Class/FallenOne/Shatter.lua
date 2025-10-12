@@ -15,6 +15,8 @@ function Spell:OnCast(Entity, Args)
 
 	local Start : AnimationTrack = Entity.Animator:Fetch("Fallen/Shatter");
 	Start:Play();
+
+	Spell.Sound.Spawn("Fallen/Shatter", Entity.Character.Root, 9)
 	
 	Start:AdjustSpeed(1.25);
 	

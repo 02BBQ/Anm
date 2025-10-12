@@ -43,11 +43,11 @@ function Spell:OnCast(Entity, Args)
 	skillTask = task.spawn(function()
 		Entity.VFX:Fire("Fallen/Berserk", {Action = "start", ID = Start.Animation.AnimationId, uid = uid});
 	
-		SkillMaid:AddTask(Spell.Sound.Spawn("Fallen/Berserk_Wind_Up", Entity.Character.Root, 5));
+		SkillMaid:AddTask(Spell.Sound.Spawn("Fallen/Berserk_Wind_Up", Entity.Character.Root, 9));
 		
 		Auxiliary.Shared.WaitForMarker(Start, "sound1")
 		
-		local walk = Spell.Sound.Spawn("Fallen/Berserk_Running", Entity.Character.Root, 5);
+		local walk = Spell.Sound.Spawn("Fallen/Berserk_Running", Entity.Character.Root, 9);
 		SkillMaid:AddTask(walk);
 		
 		Auxiliary.Shared.WaitForMarker(Start, "run")

@@ -51,13 +51,20 @@ return function(Params)
 
     Entity.Combat.Combo += 1
 
-	Animation.Stopped:Connect(function()
+
+	local ended = false;
+
+	local End = function()
+		if ended then return end;
+		ended = true;
 		LightCancel.Remove();
 		if Entity.Combat.Combo > maxCombo then
 			Entity.Cooldowns:Add("LightAttack", comboResetTime)
 		end
 		Entity.Combat:Active(true);
-	end)
+	end
+
+	Animation.Stopped:Connect(End)
 
 	Auxiliary.Shared.WaitForMarker(Animation, "hitreg");
 	
@@ -76,7 +83,7 @@ return function(Params)
 			end;
 		}
 
-		if Entity.Combat.Combo == 5 then
+		if Entity.Combat.Combo == 5+1 then
 			DamageData.Knockback.Push = 35;
 			DamageData.Damage = WeaponInfo.Damage * 1.2;
 
@@ -96,5 +103,5 @@ return function(Params)
 		return;
 	end
 
-	Entity.Combat:Active(true);
+	End();
 end
